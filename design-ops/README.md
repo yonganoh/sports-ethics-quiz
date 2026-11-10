@@ -5,7 +5,7 @@
 
 - 운영판(진척·간트·에이전트 편성): https://claude.ai/artifact/1Za9zBmz8w9KjWSfeq5UFH
 - 사용자(설계 담당자)가 직접 하는 일: CAD 모델링과 도면, 단계별 승인, 타 팀 협의, 임원 발표
-- AI는 CAD 파일(.sldprt, STEP 등)을 열지 못합니다. 치수와 사양은 표, 텍스트, PDF, 스크린샷으로 받습니다.
+- 에이전트는 CAD 파일을 직접 열지 못합니다. **STEP 파일은 메인 세션이 분석**해서 어셈블리 구성, 부품 이름, 외형, 부피를 표로 만들어 Drive `01_입력조건서`에 저장합니다(`design-ops/tools/analyze_step.py`, OpenCascade 필요: `pip install cadquery-ocp`). 재질이 STEP에 없으므로 질량은 재질 표가 있어야 나옵니다. SolidWorks 원본(.sldprt, .sldasm)은 열지 못합니다.
 
 ## 현재 만들어진 에이전트 (6명)
 
