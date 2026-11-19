@@ -981,7 +981,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     tasks: { name: "모듈 일정", title: "title", back: "일정", fields: [
       { f: "title", l: "일정", t: "text", w: 1 }, { f: "moduleId", l: "모듈", t: "mod" }, { f: "milestoneId", l: "소속 마일스톤", t: "msel" }, { f: "owner", l: "담당", t: "text" }, { f: "start", l: "시작일", t: "date" }, { f: "end", l: "종료일", t: "date" },
       { f: "status", l: "상태", t: "sel", o: [["wait", "대기"], ["run", "진행"], ["done", "완료"]] }, { f: "note", l: "메모", t: "area", w: 1 }] },
-    projects: { name: "프로젝트", title: "name", back: "프로젝트", fields: [{ f: "name", l: "프로젝트명", t: "text" }, { f: "vehicleCo", l: "차량 업체", t: "text" }, { f: "due", l: "납기", t: "date" }] },
+    projects: { name: "프로젝트", title: "name", back: "프로젝트", fields: [{ f: "name", l: "프로젝트명", t: "text" }, { f: "vehicleCo", l: "차량 업체", t: "text" }, { f: "due", l: "납기", t: "date" }, { f: "unit", l: "구성 단위 이름 (비우면 모듈, 예: 파트)", t: "text" }] },
     calcs: { name: "공식", title: "name", back: "설계 계산", fields: [
       { f: "name", l: "공식명", t: "text" }, { f: "cat", l: "분류", t: "sel", o: ["열량", "아이솔레이트", "구조해석", "기타"] }, { f: "formula", l: "공식", t: "area", w: 1, r: 2 },
       { f: "vars", l: "변수·단위", t: "area", w: 1 }, { f: "example", l: "사용 예시", t: "area", w: 1 }, { f: "src", l: "출처·비고", t: "text", w: 1 }], def: function () { return { name: "새 공식", cat: "기타" }; } }
@@ -3384,7 +3384,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       if (d.col === "tasks" && d.f === "start") { var tk = byId("tasks", d.id); if (tk && DATE_RE.test(v || "") && DATE_RE.test(tk.end || "") && tk.end < v) { obj.end = v; tk.end = v; toast("마감일이 시작일보다 빨라서 같이 옮겼습니다"); } }
       var doc = byId(d.col, d.id); if (doc) doc[d.f] = v;
       if (d.col === "meetings" && d.f === "title") { /* 제목 */ }
-      patch(d.col, d.id, obj); if (el.tagName === "SELECT" || el.type === "date") sr(); return;
+      patch(d.col, d.id, obj); if (el.tagName === "SELECT" || el.type === "date" || (d.col === "projects" && d.f === "unit")) sr(); return;
     }
     if (d.rf !== undefined) { var m = byId("modules", d.id), rv = (m.revs || []).map(function (r, i) { if (i !== +d.rev) return r; var n = Object.assign({}, r); n[d.rf] = el.value; return n; }); m.revs = rv; patch("modules", d.id, { revs: rv }); sr(); return; }
     if (d.af !== undefined) { var mt = byId("meetings", d.id), ac = (mt.actions || []).map(function (a, i) { if (i !== +d.ai) return a; var n = Object.assign({}, a); n[d.af] = el.value; return n; }); mt.actions = ac; patch("meetings", d.id, { actions: ac }); return; }
@@ -3487,16 +3487,19 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     return true;
   }
   function txApply() {
-    txLoad(); if (!Object.keys(TX.map).length) return;
+    txLoad(); var unit = txUnit(); if (!Object.keys(TX.map).length && !unit) return;
     var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null), n, hits = [];
     while ((n = w.nextNode())) {
       var p = n.parentNode; if (!p || p.nodeType !== 1) continue; var tg = p.nodeName;
       if (tg === "SCRIPT" || tg === "STYLE" || tg === "TEXTAREA" || tg === "OPTION") continue;
       if (p.closest && p.closest("#tw-txed, #tw-txbar")) continue;
       var k = txNorm(n.nodeValue); if (k && Object.prototype.hasOwnProperty.call(TX.map, k)) hits.push([n, k]);
+      else if (unit && n.nodeValue.indexOf("모듈") >= 0 && !(p.closest && p.closest("#modal, #toast"))) n.nodeValue = n.nodeValue.split("모듈").join(unit);
     }
     hits.forEach(function (h) { var m = /^(\s*)[\s\S]*?(\s*)$/.exec(h[0].nodeValue); h[0].nodeValue = m[1] + TX.map[h[1]] + m[2]; TX.node.set(h[0], h[1]); if (h[0].parentNode.classList) h[0].parentNode.classList.add("tx-el"); });
   }
+  /* 프로젝트마다 구성 단위 이름이 다르다 (종검: 모듈, 교반 탈포기: 파트). 그 프로젝트 화면 안에서만 바꿔 보여 준다 */
+  function txUnit() { if (ui.view !== "projects" || !ui.wsOpen) return ""; var pr = byId("projects", ui.pid), u = pr ? txNorm(pr.unit) : ""; return u && u !== "모듈" ? u : ""; }
   var txQueued = false, txObs = null;
   function txWatch() {
     if (txObs || typeof MutationObserver === "undefined") return;
