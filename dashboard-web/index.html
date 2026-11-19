@@ -677,6 +677,12 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
 .gfig .sec { fill: color-mix(in srgb, var(--accent) 26%, var(--surface)); stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; } .gfig .sdim { stroke: var(--info); stroke-width: 1.3; fill: none; marker-start: url(#sdm); marker-end: url(#sdm); } .gfig .sext { stroke: var(--muted); stroke-width: 1; fill: none; } .gfig .sax { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 5 4; fill: none; } .gfig .stx { font-size: 13px; font-weight: 700; fill: var(--ink); } .gfig .stk { font-size: 12px; fill: var(--muted); } .gfig .sgc { fill: var(--bad); stroke: var(--surface); stroke-width: 1; }
 .msl { width: 100%; } .msl td { vertical-align: middle; } .msl input[type=text], .msl input[type=date], .msl select { width: 100%; min-width: 0; padding: 7px 9px; font-size: 13.5px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-family: inherit; } .msl input.msl-t { font-weight: 700; } .msl input.msl-d { min-width: 128px; } .msl .msl-dd { white-space: nowrap; } .msl tr.msl-next td { background: color-mix(in srgb, var(--warn) 10%, transparent); } .msl tr.msl-late .msl-dd, .msl tr.msl-late .msl-d { color: var(--bad); } .msl select.st-done { color: var(--ok); } .msl select.st-est { color: var(--info); } .msl.stk td .stv { width: 100%; } @media (min-width: 861px) { .msl th:nth-child(1) { width: 150px; } .msl th:nth-child(3) { width: 96px; } .msl th:nth-child(4) { width: 130px; } .msl th:nth-child(6) { width: 90px; } }
 .stk td.stk-g { display: block; width: 100%; padding: 0; text-align: left; } .mvrow { flex-wrap: wrap; } .mvl { display: flex; align-items: center; gap: 6px; flex: 0 0 100%; margin: 2px 0 0 0; font-size: 12px; color: var(--muted); } .mvl .dt-mv { padding: 5px 8px; font-size: 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-family: inherit; min-width: 0; }
+#tw-txbar { position: fixed; z-index: 9000; top: 10px; left: 50%; transform: translateX(-50%); max-width: calc(100vw - 20px); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; padding: 8px 14px; border-radius: 16px; background: var(--accent); color: var(--accent-ink, #fff); font-size: 13px; line-height: 1.4; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+#tw-txed { position: fixed; z-index: 9001; left: 50%; bottom: 16px; transform: translateX(-50%); width: min(440px, calc(100vw - 20px)); max-height: 70vh; overflow: auto; padding: 16px; border-radius: 18px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 16px 48px rgba(0,0,0,.35); font-size: 14px; line-height: 1.5; }
+#tw-txed h3 { margin: 0 0 10px; font-size: 16px; } #tw-txed p { margin: 8px 0; font-size: 12.5px; color: var(--muted); } #tw-txed label { display: block; font-size: 12.5px; color: var(--muted); margin: 10px 0 4px; } #tw-txed textarea { width: 100%; box-sizing: border-box; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg, var(--surface)); color: var(--ink); font: inherit; resize: vertical; }
+#tw-txed .tx-o span { font-size: 12.5px; color: var(--muted); } #tw-txed .tx-o div { overflow-wrap: anywhere; } #tw-txed .tx-a { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; } #tw-txed .tx-l { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; } #tw-txed .tx-l li { display: flex; gap: 10px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px; } #tw-txed .tx-l div { min-width: 0; overflow-wrap: anywhere; display: grid; } #tw-txed .tx-l s { color: var(--muted); font-size: 12.5px; }
+html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-on #tw-txed * { cursor: auto !important; } html.tx-on #tw-txbar button, html.tx-on #tw-txed button { cursor: pointer !important; }
+.tx-el:not(text):not(tspan) { white-space: normal !important; overflow-wrap: anywhere; height: auto !important; max-width: 100%; text-overflow: clip !important; }
 </style>
 
 <div class="app" id="shell">
@@ -1154,7 +1160,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
     var k = ui.modal.kind, h;
     if (k === "edit") { var ed = byId(ui.modal.col, ui.modal.id); if (!ed) { ui.modal = null; m.hidden = true; m.innerHTML = ""; return; }
       h = '<h2>' + (ui.modal.col === "personal" ? "개인 할 일 수정" : "할 일 수정") + '</h2><div class="fld"><label for="ed-title">내용</label><input id="ed-title" type="text" value="' + esc(ed.title) + '"></div><div class="g2 span-f"><div class="fld"><label for="ed-date">시작일</label><input id="ed-date" type="date" value="' + esc(ed.date) + '"></div><div class="fld"><label for="ed-end">종료일 <span class="muted">(여러 날이면)</span></label><input id="ed-end" type="date" value="' + esc(ed.end && ed.end > ed.date ? ed.end : "") + '"></div></div><div class="chips span-q"><button class="btn sm" data-act="ed-ext" data-v="1">+1일 연장</button><button class="btn sm" data-act="ed-ext" data-v="7">+1주 연장</button><button class="btn sm" data-act="ed-tom">내일로 미루기</button><button class="btn sm" data-act="ed-one">하루짜리로</button></div><div class="sm muted" id="ed-span">' + spanText(ed.date, ed.end) + '</div><div class="acts" style="justify-content:space-between"><button class="btn dng" data-act="edit-del">삭제</button><span class="acts"><button class="btn" data-act="modal-close">취소</button><button class="btn pri" data-act="edit-save">저장</button></span></div>'; }
-    else if (k === "settings") h = '<h2>설정</h2>' + TGLS.map(function (x) { return tglHtml(x[0], x[1], x[2]); }).join("") + '<div class="tgl"><div><b>조명</b><div class="sm muted">웜 톤과 다크 전환</div></div><button class="btn" data-act="theme">전환</button></div><div class="acts" style="justify-content:flex-end"><button class="btn pri" data-act="modal-close">닫기</button></div>';
+    else if (k === "settings") h = '<h2>설정</h2>' + TGLS.map(function (x) { return tglHtml(x[0], x[1], x[2]); }).join("") + '<div class="tgl"><div><b>조명</b><div class="sm muted">웜 톤과 다크 전환</div></div><button class="btn" data-act="theme">전환</button></div>' + (isAdmin ? '<div class="tgl"><div><b>글자 수정 모드 (관리자)</b><div class="sm muted">화면의 글자를 눌러 직접 고칩니다. 모든 사용자에게 적용</div></div><button class="btn" data-act="tx-on">켜기</button></div>' : "") + '<div class="acts" style="justify-content:flex-end"><button class="btn pri" data-act="modal-close">닫기</button></div>';
     else h = '<h2>새 항목</h2><div class="seg">' + Object.keys(QK).map(function (x) { return '<button data-act="modal-kind" data-kind="' + x + '" aria-pressed="' + (x === k) + '" style="--c:var(--pri-bg)">' + QK[x][0] + "</button>"; }).join("") + '</div><div class="fld"><label for="qa-title">' + QK[k][0] + (k === "module" ? " 이름" : " 내용") + '</label><input id="qa-title" type="text" value="' + esc(ui.modal.title || "") + '" placeholder="' + (k === "todo" ? "예: 031 방열판 STEP 검토" : k === "issue" ? "예: 성신 접속점 위치 회신" : "예: 차상서버랙") + '"></div><div class="fld"><label for="qa-date">' + QK[k][1] + '</label><input id="qa-date" type="date" value="' + esc(ui.modal.date != null ? ui.modal.date : (k === "todo" ? TODAY() : "")) + '"></div>' + (k === "todo" || k === "ptodo" ? '<div class="fld"><label for="qa-end">종료일 <span class="muted">(여러 날 걸리는 일이면)</span></label><input id="qa-end" type="date" value=""></div>' : "") + '<div class="sm muted">' + (k === "todo" ? "TODO · 달력에 추가됩니다." : esc(curP().name) + " 프로젝트에 추가됩니다.") + '</div><div class="acts" style="justify-content:flex-end"><button class="btn" data-act="modal-close">취소</button><button class="btn pri" data-act="qa-save">추가</button></div>';
     m.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-label="' + (k === "settings" ? "설정" : "새 항목") + '">' + h + "</div>"; m.hidden = false;
     var ti = $("#qa-title") || $("#ed-title"); if (ti) ti.focus();
@@ -3323,6 +3329,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
       case "modal-open": ui.modal = { kind: d.kind || "todo" }; renderModal(); break;
       case "modal-bg": if (e.target !== el) return; ui.modal = null; renderModal(); break;
       case "modal-close": ui.modal = null; renderModal(); break;
+      case "tx-on": if (!isAdmin) break; ui.modal = null; renderModal(); TX.on = true; txBar(); break;
       case "modal-kind": ui.modal = { kind: d.kind, title: ($("#qa-title") || {}).value || "", date: ($("#qa-date") || {}).value || null }; if (!ui.modal.date) ui.modal.date = null; renderModal(); break;
       case "qa-save": qaSave(); break;
       case "todo-edit": if (e.target.type === "checkbox") return; ui.modal = { kind: "edit", col: d.col, id: id }; renderModal(); break;
@@ -3468,6 +3475,97 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
     ui.aiBusy = false; sr();
   }
 
+  /* ---------- 관리자 글자 수정 모드 ----------
+     화면 글자를 눌러 고치면 settings/texts 에 { 원래 문구 → 새 문구 }로 저장하고,
+     화면이 그려질 때마다 같은 문구를 찾아 바꿔 넣는다. 원본 코드는 건드리지 않는다. */
+  var TX = { on: false, map: {}, rev: {}, sig: null, node: new WeakMap(), cur: null, list: false };
+  var txNorm = function (s) { return String(s == null ? "" : s).replace(/\s+/g, " ").trim(); };
+  function txLoad() {
+    var d = byId("settings", "texts"), L = d && Array.isArray(d.list) ? d.list : [], sig = JSON.stringify(L);
+    if (sig === TX.sig) return false; TX.sig = sig; TX.map = {}; TX.rev = {};
+    L.forEach(function (x) { if (x && x.o && typeof x.n === "string" && x.n !== x.o) { TX.map[x.o] = x.n; TX.rev[x.n] = x.o; } });
+    return true;
+  }
+  function txApply() {
+    txLoad(); if (!Object.keys(TX.map).length) return;
+    var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null), n, hits = [];
+    while ((n = w.nextNode())) {
+      var p = n.parentNode; if (!p || p.nodeType !== 1) continue; var tg = p.nodeName;
+      if (tg === "SCRIPT" || tg === "STYLE" || tg === "TEXTAREA" || tg === "OPTION") continue;
+      if (p.closest && p.closest("#tw-txed, #tw-txbar")) continue;
+      var k = txNorm(n.nodeValue); if (k && Object.prototype.hasOwnProperty.call(TX.map, k)) hits.push([n, k]);
+    }
+    hits.forEach(function (h) { var m = /^(\s*)[\s\S]*?(\s*)$/.exec(h[0].nodeValue); h[0].nodeValue = m[1] + TX.map[h[1]] + m[2]; TX.node.set(h[0], h[1]); if (h[0].parentNode.classList) h[0].parentNode.classList.add("tx-el"); });
+  }
+  var txQueued = false, txObs = null;
+  function txWatch() {
+    if (txObs || typeof MutationObserver === "undefined") return;
+    var opt = { childList: true, subtree: true, characterData: true };
+    txObs = new MutationObserver(function () {
+      if (txQueued) return; txQueued = true;
+      requestAnimationFrame(function () { txQueued = false; txObs.disconnect(); try { txApply(); } catch (e) {} txObs.observe(document.body, opt); });
+    });
+    txObs.observe(document.body, opt); try { txApply(); } catch (e) {}
+  }
+  function txSave(orig, nu) {
+    var L = Object.keys(TX.map).filter(function (o) { return o !== orig; }).map(function (o) { return { o: o, n: TX.map[o] }; });
+    if (nu != null && nu !== orig) L.push({ o: orig, n: nu });
+    TX.sig = JSON.stringify(L); TX.map = {}; TX.rev = {}; L.forEach(function (x) { TX.map[x.o] = x.n; TX.rev[x.n] = x.o; });
+    var doc = byId("settings", "texts"); if (doc) doc.list = L; else D.settings.push({ id: "texts", list: L });
+    write("settings", "texts", function () { return { list: L }; });
+  }
+  function txBar() {
+    var b = $("#tw-txbar");
+    if (!TX.on) { if (b) b.remove(); var e0 = $("#tw-txed"); if (e0) e0.remove(); document.documentElement.classList.remove("tx-on"); return; }
+    if (!b) { b = document.createElement("div"); b.id = "tw-txbar"; document.body.appendChild(b); }
+    document.documentElement.classList.add("tx-on");
+    b.innerHTML = '<b>글자 수정 모드</b><span>바꾼 글자 ' + Object.keys(TX.map).length + '개</span><button class="btn sm" data-tx="list">바꾼 목록</button><button class="btn sm pri" data-tx="off">끄기</button>';
+  }
+  function txPanel(html) {
+    var p = $("#tw-txed"); if (html == null) { if (p) p.remove(); return null; }
+    if (!p) { p = document.createElement("div"); p.id = "tw-txed"; p.setAttribute("role", "dialog"); p.setAttribute("aria-label", "글자 수정"); document.body.appendChild(p); }
+    p.innerHTML = html; return p;
+  }
+  function txOpen(node, el) {
+    var cur = txNorm(node.nodeValue), orig = TX.node.get(node) || TX.rev[cur] || cur; TX.cur = { node: node, orig: orig, el: el || null }; TX.list = false;
+    var p = txPanel('<h3>글자 수정</h3><div class="tx-o"><span>원래 문구</span><div>' + esc(orig) + '</div></div><label for="tx-in">새 문구</label><textarea id="tx-in" rows="3">' + esc(cur) + '</textarea><p>같은 문구는 모든 화면에서 함께 바뀝니다. 길어지면 칸이 따라 늘어납니다.</p><div class="tx-a"><button class="btn pri" data-tx="save">저장</button>' + (orig !== cur ? '<button class="btn" data-tx="reset">원래대로</button>' : "") + '<button class="btn" data-tx="cancel">취소</button>' + (el ? '<button class="btn" data-tx="go">고치지 않고 이 버튼 누르기</button>' : "") + '</div>');
+    var ta = p.querySelector("#tx-in"); if (ta) { ta.focus(); ta.select(); }
+  }
+  function txListPanel() {
+    TX.list = true; TX.cur = null; var ks = Object.keys(TX.map);
+    txPanel('<h3>바꾼 글자 ' + ks.length + '개</h3>' + (ks.length ? '<ul class="tx-l">' + ks.map(function (o, i) { return '<li><div><s>' + esc(o) + '</s><b>' + esc(TX.map[o]) + '</b></div><button class="btn sm" data-tx="undo" data-i="' + i + '">원래대로</button></li>'; }).join("") + '</ul>' : '<p>아직 바꾼 글자가 없습니다.</p>') + '<div class="tx-a">' + (ks.length ? '<button class="btn dng" data-tx="undo-all">모두 원래대로</button>' : "") + '<button class="btn" data-tx="cancel">닫기</button></div>');
+  }
+  function txNodeAt(x, y, target) {
+    var ok = function (n) { return n && n.nodeType === 3 && /[A-Za-z0-9가-힣]/.test(n.nodeValue) && n.parentNode && ["SCRIPT", "STYLE", "TEXTAREA", "OPTION"].indexOf(n.parentNode.nodeName) < 0; }, n = null;
+    try { if (document.caretRangeFromPoint) { var r = document.caretRangeFromPoint(x, y); n = r && r.startContainer; } else if (document.caretPositionFromPoint) { var cp = document.caretPositionFromPoint(x, y); n = cp && cp.offsetNode; } } catch (e) {}
+    if (ok(n) && target.contains(n)) return n;
+    var w = document.createTreeWalker(target, NodeFilter.SHOW_TEXT, null), t; while ((t = w.nextNode())) if (ok(t)) return t;
+    return null;
+  }
+  function txRedraw() { txBar(); try { sr(); } catch (e) {} if (TX.list) txListPanel(); }
+  document.addEventListener("click", function (e) {
+    var t = e.target; if (!t || !t.closest) return;
+    var c = t.closest("[data-tx]");
+    if (c) {
+      e.preventDefault(); e.stopImmediatePropagation(); var a = c.dataset.tx;
+      if (a === "off") { TX.on = false; txBar(); }
+      else if (a === "list") txListPanel();
+      else if (a === "cancel") { txPanel(null); TX.list = false; }
+      else if (a === "go" && TX.cur && TX.cur.el) { var ge = TX.cur.el; txPanel(null); TX.on = false; try { if (document.body.contains(ge)) ge.click(); } finally { TX.on = true; } }
+      else if (a === "save" && TX.cur) { var v = txNorm(($("#tx-in") || {}).value); if (!v) { toast("빈 문구는 저장할 수 없습니다. 원래대로를 쓰세요"); return; } txSave(TX.cur.orig, v); txPanel(null); txRedraw(); toast("글자를 바꿨습니다"); }
+      else if (a === "reset" && TX.cur) { txSave(TX.cur.orig, null); txPanel(null); txRedraw(); toast("원래 문구로 되돌렸습니다"); }
+      else if (a === "undo") { var o = Object.keys(TX.map)[+c.dataset.i]; if (o) { txSave(o, null); txRedraw(); } }
+      else if (a === "undo-all") { if (c.dataset.sure) { TX.map = {}; txSave("", null); txRedraw(); toast("모두 원래대로 되돌렸습니다"); } else { c.dataset.sure = "1"; c.textContent = "한 번 더 누르면 모두 되돌림"; } }
+      return;
+    }
+    if (!TX.on) return;
+    if (t.closest("#tw-txed, #tw-txbar")) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    var n = txNodeAt(e.clientX, e.clientY, t); if (!n) { toast("여기에는 고칠 글자가 없습니다"); return; }
+    txOpen(n, t.closest("button, a, [data-act], summary, label"));
+  }, true);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && $("#tw-txed")) { txPanel(null); TX.list = false; } });
+
   /* ---------- 시작 ---------- */
   try { var th0 = localStorage.getItem("tw-theme"); if (th0) document.documentElement.setAttribute("data-theme", th0); } catch (e) {}
   try { var h0 = location.hash.slice(1); if (VIEWS.indexOf(h0) >= 0) ui.view = h0; } catch (e) {}
@@ -3479,7 +3577,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
     try { var sp = localStorage.getItem("tw-pid"); if (sp) ui.pid = sp; } catch (e) {}
     if (user) { try { isAdmin = !!(await Promise.resolve(user.canEdit())); var w = await Promise.resolve(user.can("data.write")); canW = w !== false; } catch (e) {} try { uid = (await Promise.resolve(user.id())) || null; } catch (e) { uid = null; } }
     if (!db) { render(); return; }
-    bindDict();
+    bindDict(); txWatch();
     var timer = setTimeout(function () { if (!Object.keys(LOADED).length) { var b = document.createElement("div"); b.className = "banner"; b.textContent = "데이터를 아직 불러오지 못했습니다. 네트워크를 확인해 주세요."; $("#main").prepend(b); } }, 10000);
     COLS.forEach(function (col) {
       if (col === "contacts" && !isAdmin) return;
