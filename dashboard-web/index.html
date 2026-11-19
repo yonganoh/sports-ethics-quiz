@@ -670,6 +670,10 @@ th { background: transparent; } tbody tr[data-act]:hover td { background: color-
 @media (prefers-reduced-motion: reduce) { .rise, .sheet { animation: none; } #main, #main.leave { transition: none; transform: none; } .ring-fg, .meter > i, .bfill, .sw::after, .pill-in .ind { transition: none; } }
 body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ring-fg, body.nomotion .meter > i, body.nomotion .bfill, body.nomotion .pill-in .ind { transition: none; }
 .mpm summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.mpl{list-style:none;margin:10px 0;padding:0;display:grid;gap:8px}.mpl li{display:flex;align-items:center;gap:10px}.mpl .mpn{flex:1;min-width:0;overflow-wrap:anywhere}.mpl .mpn.off{opacity:.45;text-decoration:line-through}.mpm input[type=text]{flex:1;min-width:140px}
+.mod-ctl { display: grid; gap: 8px; margin: 4px 0 10px; } .mc-row { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; } .mc-row select { max-width: 100%; }
+.mowner { font-size: 11.5px; color: var(--muted); margin-top: 2px; } tr.grp-r td { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); padding: 8px 12px; }
+.dg-lc .mono { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .dg-row.dg-g { height: 34px; } .dg-row.dg-g .dg-lc { cursor: default; background: color-mix(in srgb, var(--accent) 10%, var(--surface)); flex-direction: row; align-items: center; gap: 8px; } .dg-row.dg-g .dg-tr { background: color-mix(in srgb, var(--accent) 6%, transparent); } .dg-gl b { white-space: nowrap; }
+.sect-co h2, .sect-team h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; } .sect-co { border-left: 4px solid var(--info, #4a7fb0); } .sect-team { border-left: 4px solid var(--accent); }
 </style>
 
 <div class="app" id="shell">
@@ -739,6 +743,50 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
   var strip = function (o) { var r = {}; for (var k in o) if (k !== "id") r[k] = o[k]; return r; };
   var sorted = function (c, f) { return D[c].slice().sort(f); };
   var modSorted = function (pid) { return sorted("modules", function (a, b) { return (a.order || 99) - (b.order || 99); }).filter(function (m) { return !pid || pidOf(m) === pid; }); };
+  /* 담당자: 이름만 쓰는 것이 원칙. 직함은 떼고, 여러 명은 "·"로 잇는다 */
+  var OWNER_TITLES = "님|대리|과장|차장|부장|팀장|실장|사원|주임|책임|선임|수석|이사|상무|전무|대표|매니저|연구원|프로";
+  function ownerName(v) {
+    var re = new RegExp("\\s+(" + OWNER_TITLES + ")$");
+    return String(v == null ? "" : v).split(/\s*[·,\/、]\s*/).map(function (x) { return x.trim().replace(re, "").replace(/\s+/g, ""); }).filter(Boolean).filter(function (x, i, a) { return a.indexOf(x) === i; }).join("·");
+  }
+  function modOwners(m) { var o = ownerName(m.owner); return o ? o.split("·") : []; }
+  function ownerList(pid) {
+    var seen = {}, out = [], none = false;
+    modSorted(pid).forEach(function (m) { var o = modOwners(m); if (!o.length) none = true; o.forEach(function (n) { if (!seen[n]) { seen[n] = 1; out.push(n); } }); });
+    out.sort(); return { names: out, none: none };
+  }
+  /* 모듈 정렬: 기본은 일정(시작일)이 빠른 순. 날짜 없는 모듈은 맨 아래 */
+  var MSORT = [["start-a", "시작일 빠른 순"], ["start-d", "시작일 늦은 순"], ["target-a", "목표일 빠른 순"], ["target-d", "목표일 늦은 순"], ["pct-a", "진행률 낮은 순"], ["pct-d", "진행률 높은 순"], ["name-a", "이름 가나다순"], ["code-a", "번호순"]];
+  function modKey(m, k) {
+    var pl = planOf(m), t = m.newTarget || m.target;
+    if (k === "start") return pl.length ? pl[0].s : DATE_RE.test(m.start || "") ? dnum(m.start) : null;
+    if (k === "target") return DATE_RE.test(t || "") ? dnum(t) : pl.length ? pl[pl.length - 1].e : null;
+    if (k === "pct") return modPct(m);
+    if (k === "name") return m.name || "";
+    return shortCode(m);
+  }
+  function modSortList(list, mode) {
+    var k = (mode || "start-a").split("-")[0], dir = (mode || "start-a").split("-")[1] === "d" ? -1 : 1;
+    return list.slice().sort(function (a, b) {
+      var x = modKey(a, k), y = modKey(b, k);
+      if (x == null && y == null) return (a.order || 99) - (b.order || 99);
+      if (x == null) return 1; if (y == null) return -1;
+      if (x === y) return (a.order || 99) - (b.order || 99);
+      return (x < y ? -1 : 1) * dir;
+    });
+  }
+  function ownerGroups(list, only) {
+    var g = {}, order = [];
+    list.forEach(function (m) { var os = modOwners(m); if (!os.length) os = ["미지정"]; os.forEach(function (o) { if (!g[o]) { g[o] = []; order.push(o); } g[o].push(m); }); });
+    order.sort(function (a, b) { return (a === "미지정") - (b === "미지정"); });
+    return order.filter(function (o) { return !only || o === only; }).map(function (o) { return { name: o, mods: g[o] }; });
+  }
+  function modState() {
+    if (!ui.mst) { ui.mst = { view: "stage", grp: "all", sort: "start-a", own: "" }; try { var r = JSON.parse(localStorage.getItem("tw-mod") || "null"); if (r) for (var k in ui.mst) if (typeof r[k] === "string") ui.mst[k] = r[k]; } catch (e) {} if (!MSORT.some(function (x) { return x[0] === ui.mst.sort; })) ui.mst.sort = "start-a"; }
+    return ui.mst;
+  }
+  function modStateSave() { try { var o = Object.assign({}, ui.mst, { own: "" }); localStorage.setItem("tw-mod", JSON.stringify(o)); } catch (e) {} }
+  var ownLine = function (m) { var o = ownerName(m.owner); return o ? "담당자 : " + esc(o) : '<span class="muted">담당자 : 미지정</span>'; };
   var toastT;
   function toast(m) { var t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 3200); }
 
@@ -926,6 +974,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
   function fInput(col, doc, F) {
     var v = doc[F.f] == null ? "" : doc[F.f];
     var at = 'data-col="' + col + '" data-id="' + doc.id + '" data-f="' + F.f + '" id="f-' + F.f + '"' + (canW ? "" : " disabled");
+    if (F.f === "owner" && (col === "modules" || col === "tasks") && F.t === "text") return "<input " + at + ' value="' + esc(v) + '" list="ownerDl" placeholder="이름만 (예: 오용안)" autocomplete="off"><datalist id="ownerDl">' + ownerList(pidOf(doc) || ui.pid).names.map(function (n) { return '<option value="' + esc(n) + '">'; }).join("") + "</datalist>";
     if (F.t === "area") return "<textarea " + at + ' rows="' + (F.r || 3) + '">' + esc(v) + "</textarea>";
     if (F.t === "date") return '<input type="date" ' + at + ' value="' + esc(v) + '">';
     if (F.t === "num") return '<input type="number" step="any" ' + at + ' value="' + esc(v) + '">';
@@ -976,7 +1025,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
   function vDetail() {
     var col = ui.detail.col, doc = byId(col, ui.detail.id), S = SC[col];
     if (!doc) return head("", "찾을 수 없음", "삭제되었거나 아직 불러오는 중입니다.", '<button class="btn" data-act="back">← 목록</button>');
-    var h = head('<button class="linkbtn" data-act="back">← ' + S.back + "</button>", esc(doc[S.title] || "(제목 없음)"), "", delBtn(col, doc.id));
+    var h = head('<button class="linkbtn" data-act="back">← ' + S.back + "</button>", esc(doc[S.title] || "(제목 없음)"), col === "modules" ? ownLine(doc) : "", delBtn(col, doc.id));
     var body = '<div class="card">' + formHtml(col, doc) + "</div>";
     if (col === "modules") body = vModDetail(doc);
     if (col === "partners") body += vContacts(doc);
@@ -1124,7 +1173,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
   }
 
   /* ---------- 프로젝트 목록 · 운영판 ---------- */
-  var TABS = [["dash", "대시보드"], ["mods", "모듈"], ["sched", "일정"], ["contacts", "연락처"], ["docs", "문서"], ["agents", "에이전트 편성"], ["flow", "흐름·양식"]];
+  var TABS = [["dash", "대시보드"], ["mods", "모듈"], ["sched", "전체 일정"], ["contacts", "연락처"], ["docs", "문서"], ["agents", "에이전트 편성"], ["flow", "흐름·양식"]];
   function nextMsOf(pid) { var t = TODAY(); return inP("milestones", pid).filter(function (m) { return m.date && m.date >= t && m.status !== "done"; }).sort(byDate)[0]; }
   function avgOf(mods) { return mods.length ? Math.round(mods.reduce(function (a, m) { return a + modPct(m); }, 0) / mods.length) : 0; }
   function vProjList() {
@@ -1173,9 +1222,9 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
       '<div class="card"><h2>다가오는 일정 <button class="linkbtn" data-act="tab" data-v="sched">전체 일정 →</button></h2>' + (up ? '<ul class="alist">' + up + "</ul>" : '<div class="empty">예정된 일정이 없습니다.</div>') + "</div>" +
       '<div class="card"><h2>유형별 진척</h2><div class="srow"><span>자체 설계 ' + self.length + '</span><div class="sbar"><i style="width:' + avgOf(self) + '%"></i></div><span class="cnt">' + avgOf(self) + '%</span></div><div class="srow"><span>외주·프레임 ' + ext.length + '</span><div class="sbar"><i style="width:' + avgOf(ext) + '%"></i></div><span class="cnt">' + avgOf(ext) + "%</span></div></div>";
   }
-  function dashGantt(mods) {
-    var tn = TN();
-    var rows = mods.slice().sort(function (a, b) { return (a.order || 99) - (b.order || 99); }).map(function (m) {
+  function dashGantt(mods, opt) {
+    var tn = TN(); opt = opt || {};
+    var rows = modSortList(mods, opt.sort || "start-a").map(function (m) {
       var pl = planOf(m), assumed = false;
       if (!pl.length) { var sv = m.start; m.start = dstr(tn); pl = planOf(m); m.start = sv; assumed = true; }
       return { m: m, pl: pl, assumed: assumed, pct: modPct(m) };
@@ -1190,17 +1239,46 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
     for (var w = lo; w <= hi; w += 7) { var wd = new Date(w * DAY); weeks += '<span style="left:' + (w - lo) * dayw + 'px">' + pad(wd.getUTCMonth() + 1) + "-" + pad(wd.getUTCDate()) + "</span>"; grid += '<i style="left:' + (w - lo) * dayw + 'px"></i>'; }
     var tx = (tn - lo) * dayw + dayw / 2, td = new Date(tn * DAY);
     var html = '<div class="dg-wrap" id="dgWrap" data-tx="' + tx + '"><div class="dg" style="width:calc(var(--dgl) + ' + W + 'px)"><div class="dg-head"><div class="dg-hl">모듈</div><div class="dg-ht" style="width:' + W + 'px"><div class="dg-m">' + months + '</div><div class="dg-w">' + weeks + '</div></div></div><div class="dg-body"><div class="dg-grid" style="left:var(--dgl);width:' + W + 'px">' + grid + '</div><div class="dg-today" style="left:calc(var(--dgl) + ' + tx + 'px)"><b>오늘 ' + (td.getUTCMonth() + 1) + "/" + td.getUTCDate() + "</b></div>";
-    rows.forEach(function (r) {
+    var seq = rows.map(function (r) { return { r: r }; });
+    if (opt.group) {
+      var byId2 = {}; rows.forEach(function (r) { byId2[r.m.id] = r; }); seq = [];
+      ownerGroups(rows.map(function (r) { return r.m; }), opt.only).forEach(function (g) { seq.push({ g: g }); g.mods.forEach(function (m) { seq.push({ r: byId2[m.id] }); }); });
+    }
+    seq.forEach(function (q) {
+      if (q.g) { var avg = Math.round(q.g.mods.reduce(function (a, m) { return a + modPct(m); }, 0) / q.g.mods.length); html += '<div class="dg-row dg-g"><div class="dg-lc dg-gl"><b>담당자 : ' + esc(q.g.name) + '</b><span class="mono">모듈 ' + q.g.mods.length + "개 · 평균 " + avg + '%</span></div><div class="dg-tr" style="width:' + W + 'px"></div></div>'; return; }
+      var r = q.r;
       var m = r.m, f = r.pl[0].s, l = r.pl[r.pl.length - 1].e, left = (f - lo) * dayw, wid = (l - f + 1) * dayw, ci = curStageIdx(m), cur = ci ? stageName(m, ci) : "전 단계 완료", seg = "";
       r.pl.forEach(function (p) { var v = stageOf(m, p.i); seg += '<i class="sg ' + v + '" style="left:' + (p.s - f) * dayw + "px;width:" + (p.e - p.s + 1) * dayw + 'px" title="' + esc(stageName(m, p.i) + " " + dstr(p.s) + " ~ " + dstr(p.e) + " · " + ST_LABEL[v]) + '"></i>'; });
       var late = !r.assumed && DATE_RE.test(m.newTarget || m.target || "") && dstr(l) > (m.newTarget || m.target);
-      html += '<div class="dg-row"><div class="dg-lc" data-act="open" data-col="modules" data-id="' + m.id + '"><span class="mono">' + esc(shortCode(m)) + (m.owner ? " · " + esc(m.owner) : "") + "</span><b>" + esc(m.name) + '</b></div><div class="dg-tr" style="width:' + W + 'px"><div class="dg-bar' + (r.assumed ? " assumed" : "") + (m.kind === "ext" ? " ext" : "") + (late ? " late" : "") + '" style="left:' + left + "px;width:" + wid + 'px">' + seg + '<span class="dg-pct">' + r.pct + '%</span></div><span class="dg-note" style="left:' + (left + wid + 8) + 'px">' + esc(cur) + (r.assumed ? " · 시작일 미정(오늘 시작 가정)" : " · ~" + dstr(l).slice(5)) + (late ? " · 목표일 초과" : "") + "</span></div></div>";
+      html += '<div class="dg-row"><div class="dg-lc" data-act="open" data-col="modules" data-id="' + m.id + '"><span class="mono">' + esc(shortCode(m)) + " · " + ownLine(m) + "</span><b>" + esc(m.name) + '</b></div><div class="dg-tr" style="width:' + W + 'px"><div class="dg-bar' + (r.assumed ? " assumed" : "") + (m.kind === "ext" ? " ext" : "") + (late ? " late" : "") + '" style="left:' + left + "px;width:" + wid + 'px">' + seg + '<span class="dg-pct">' + r.pct + '%</span></div><span class="dg-note" style="left:' + (left + wid + 8) + 'px">' + esc(cur) + (r.assumed ? " · 시작일 미정(오늘 시작 가정)" : " · ~" + dstr(l).slice(5)) + (late ? " · 목표일 초과" : "") + "</span></div></div>";
     });
     return html + '</div></div></div><div class="dg-legend"><span><i class="sg done"></i>완료</span><span><i class="sg doing"></i>진행</span><span><i class="sg todo"></i>대기</span><span>모듈 이름을 누르면 편집 · 주말·공휴일 제외 표준 소요일 기준 자동 계획</span></div>';
   }
+  function msTable(ms) {
+    var tn = TN(), all = ms.slice().sort(function (a, b) { if (!a.date && !b.date) return 0; if (!a.date) return 1; if (!b.date) return -1; return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+    var hid = ui.showPast ? [] : all.filter(function (m) { return m.status === "done" && m.date && dnum(m.date) < tn - 14; }), rows = all.filter(function (m) { return hid.indexOf(m) < 0; });
+    if (!all.length) return '<div class="empty">등록된 마일스톤이 없습니다. 전체 일정 탭에서 추가하세요.</div>';
+    var ST = { plan: "계획", done: "완료", est: "예상", tbd: "미정" }, PC = { plan: "gray", done: "ok", est: "info", tbd: "gray" };
+    var h = '<div class="tw"><table><thead><tr><th>일정</th><th>날짜</th><th>남은 기간</th><th>상태</th><th>비고</th></tr></thead><tbody>';
+    rows.forEach(function (m) {
+      var st = m.status || "plan", dt = m.date ? (m.precision === "m" ? m.date.slice(0, 4) + "." + m.date.slice(5, 7) + " (월)" : fmtY(m.date)) : "미정";
+      h += '<tr><td class="pri"><button class="mname" data-act="open" data-col="milestones" data-id="' + m.id + '">' + esc(m.title) + '</button></td><td class="mono sm">' + esc(dt) + (m.newDate ? '<div class="sm" style="color:var(--warn)">변경 ' + esc(fmtY(m.newDate)) + "</div>" : "") + '</td><td class="sm">' + (m.date && st !== "done" ? esc(ddText(m.date)) : "—") + '</td><td><span class="pill p-' + (PC[st] || "gray") + '">' + (ST[st] || st) + '</span></td><td class="sm">' + esc(m.delayReason || "") + "</td></tr>";
+    });
+    return h + "</tbody></table></div>" + (hid.length ? '<div class="acts" style="margin-top:8px"><button class="btn sm" data-act="ms-past">지난 완료 ' + hid.length + "개 보기</button></div>" : ui.showPast && all.some(function (m) { return m.status === "done" && m.date && dnum(m.date) < tn - 14; }) ? '<div class="acts" style="margin-top:8px"><button class="btn sm" data-act="ms-past">지난 완료 숨기기</button></div>' : "");
+  }
+  function modSchedTable(mods) {
+    var h = '<div class="tw"><table><thead><tr><th>코드</th><th>모듈</th><th>담당자</th><th>시작</th><th>목표</th><th>진행</th></tr></thead><tbody>';
+    modSortList(mods, "start-a").forEach(function (m) {
+      var t = m.newTarget || m.target, pl = planOf(m), e = pl.length ? dstr(pl[pl.length - 1].e) : "";
+      h += '<tr><td class="code">' + esc(shortCode(m)) + '</td><td><button class="mname" data-act="open" data-col="modules" data-id="' + m.id + '">' + esc(m.name) + '</button></td><td class="sm">' + (ownerName(m.owner) ? esc(ownerName(m.owner)) : '<span class="muted">미지정</span>') + '</td><td class="mono sm">' + (DATE_RE.test(m.start || "") ? esc(m.start) : '<span class="muted">미정</span>') + '</td><td class="mono sm">' + (DATE_RE.test(t || "") ? esc(t) : e ? '<span class="muted">예상</span> ' + esc(e) : '<span class="muted">미정</span>') + '</td><td class="mono sm">' + modPct(m) + "%</td></tr>";
+    });
+    return h + "</tbody></table></div>";
+  }
   function wsDash(p) {
     var mods = inP("modules"), ms = inP("milestones");
-    return wsSummary(mods, ms) + '<div class="dash-grid">' + wsAttn(mods, ms) + frameBoard(mods, false) + '</div><div class="card"><h2>모듈 일정</h2>' + dashGantt(mods) + "</div>" + projInfo(p);
+    return wsSummary(mods, ms) + '<div class="dash-grid">' + wsAttn(mods, ms) + frameBoard(mods, false) + "</div>" +
+      '<div class="card sect-co"><h2>전체 일정 <span class="sm muted">회사 프로젝트 일정</span> <button class="linkbtn" data-act="tab" data-v="sched">전체 일정 탭 →</button></h2>' + msTable(ms) + "</div>" +
+      '<div class="card sect-team"><h2>모듈 일정 <span class="sm muted">팀 일정</span> <button class="linkbtn" data-act="mod-go" data-v="sched">모듈 탭에서 자세히 →</button></h2>' + dashGantt(mods) + '<div style="margin-top:14px">' + modSchedTable(mods) + "</div></div>" + projInfo(p);
   }
   function projInfo(p) {
     if (!byId("projects", p.id)) return '<div class="banner">프로젝트 정보가 아직 저장되지 않았습니다(기본값 표시 중).</div>';
@@ -1210,13 +1288,24 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
 
   /* --- 모듈 --- */
   function wsMods(p) {
-    var f = ui.filt.mod || "전체", mods = modSorted(ui.pid).filter(function (m) { return f === "전체" || (f === "자체" && m.kind !== "ext") || (f === "외주" && m.kind === "ext") || (f === "프레임 협의 중" && frameWait(m)); });
+    var S = modState(), f = ui.filt.mod || "전체", OL = ownerList(ui.pid);
+    if (S.own && S.own !== "미지정" && OL.names.indexOf(S.own) < 0) S.own = ""; if (S.own === "미지정" && !OL.none) S.own = "";
+    var base = modSorted(ui.pid).filter(function (m) { return f === "전체" || (f === "자체" && m.kind !== "ext") || (f === "외주" && m.kind === "ext") || (f === "프레임 협의 중" && frameWait(m)); });
+    var mods = modSortList(base.filter(function (m) { var o = modOwners(m); return !S.own || (S.own === "미지정" ? !o.length : o.indexOf(S.own) >= 0); }), S.sort);
     var h = '<div class="toolbar-row">' + chipsHtml("mod", ["전체", "자체", "외주", "프레임 협의 중"]) + addBtn("modules", "모듈 추가") + "</div>";
-    if (!mods.length) return h + '<div class="card"><div class="empty">' + (LOADED.modules ? "표시할 모듈이 없습니다. 모듈 추가로 등록하세요." : "불러오는 중…") + "</div></div>";
+    var seg = function (act, cur, opts) { return '<div class="chips" role="group">' + opts.map(function (o) { return '<button class="chip" data-act="' + act + '" data-v="' + o[0] + '" aria-pressed="' + (cur === o[0]) + '">' + o[1] + "</button>"; }).join("") + "</div>"; };
+    h += '<div class="mod-ctl"><div class="mc-row"><span class="sm muted">보기</span>' + seg("mod-view", S.view, [["stage", "단계"], ["sched", "일정"]]) + '<span class="sm muted">묶기</span>' + seg("mod-grp", S.grp, [["all", "전체"], ["owner", "담당자별"]]) +
+      '<label class="sm muted" for="modSort">정렬</label><select id="modSort" data-modsort="1">' + MSORT.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === S.sort ? " selected" : "") + ">" + x[1] + "</option>"; }).join("") + '</select></div>' +
+      '<div class="mc-row"><span class="sm muted">담당자</span><div class="chips"><button class="chip" data-act="mod-own" data-v="" aria-pressed="' + (!S.own) + '">전체</button>' + OL.names.map(function (n) { return '<button class="chip" data-act="mod-own" data-v="' + esc(n) + '" aria-pressed="' + (S.own === n) + '">' + esc(n) + "</button>"; }).join("") + (OL.none ? '<button class="chip" data-act="mod-own" data-v="미지정" aria-pressed="' + (S.own === "미지정") + '">미지정</button>' : "") + "</div></div></div>";
+    if (!mods.length) return h + '<div class="card"><div class="empty">' + (LOADED.modules ? "표시할 모듈이 없습니다. 모듈 추가로 등록하거나 필터를 바꿔 보세요." : "불러오는 중…") + "</div></div>";
+    if (S.view === "sched") return h + '<div class="card">' + dashGantt(mods, { sort: S.sort, group: S.grp === "owner", only: S.own }) + '</div><ul class="plines"><li>정렬 기준: <b>' + esc((MSORT.filter(function (x) { return x[0] === S.sort; })[0] || MSORT[0])[1]) + "</b>. 날짜가 없는 모듈은 맨 아래에 모입니다.</li>" + (S.grp === "owner" ? "<li>담당자가 두 명인 모듈은 각 담당자 구역에 모두 나옵니다.</li>" : "") + "<li>막대는 시작일부터 단계별 기본 소요일로 계산한 일정입니다. 모듈 이름을 누르면 시작일 · 목표일 · 담당자를 고칠 수 있습니다.</li></ul>";
     h += '<div class="card board" style="padding:6px 8px"><div class="tw"><table><thead><tr><th>코드</th><th>모듈</th><th>유형</th>' + STAGE_NAMES.map(function (n, i) { return '<th class="c">' + esc(n) + "</th>" + (i === 2 ? '<th class="c">프레임</th>' : ""); }).join("") + "<th>진척</th><th>제출 후</th><th>목표일</th></tr></thead><tbody>";
-    mods.forEach(function (m) {
-      var pct = modPct(m);
-      h += '<tr><td class="code">' + esc(shortCode(m)) + '</td><td><button class="mname" data-act="open" data-col="modules" data-id="' + m.id + '">' + esc(m.name) + "</button>" + (stalled(m) ? ' <span class="bdg bad">정체</span>' : "") + '</td><td><span class="kind' + (m.kind === "ext" ? " ext" : "") + '">' + (m.kind === "ext" ? "외주" : "자체") + "</span></td>";
+    var ncol = 3 + NS + 1 + 3, seq = S.grp === "owner" ? [] : mods.map(function (m) { return { m: m }; });
+    if (S.grp === "owner") ownerGroups(mods, S.own).forEach(function (g) { seq.push({ g: g }); g.mods.forEach(function (m) { seq.push({ m: m }); }); });
+    seq.forEach(function (q) {
+      if (q.g) { h += '<tr class="grp-r"><td colspan="' + ncol + '"><b>담당자 : ' + esc(q.g.name) + '</b> <span class="sm muted">모듈 ' + q.g.mods.length + "개 · 평균 " + Math.round(q.g.mods.reduce(function (a, m) { return a + modPct(m); }, 0) / q.g.mods.length) + "%</span></td></tr>"; return; }
+      var m = q.m, pct = modPct(m);
+      h += '<tr><td class="code">' + esc(shortCode(m)) + '</td><td><button class="mname" data-act="open" data-col="modules" data-id="' + m.id + '">' + esc(m.name) + "</button>" + (stalled(m) ? ' <span class="bdg bad">정체</span>' : "") + '<div class="mowner">' + ownLine(m) + '</div></td><td><span class="kind' + (m.kind === "ext" ? " ext" : "") + '">' + (m.kind === "ext" ? "외주" : "자체") + "</span></td>";
       for (var i = 1; i <= NS; i++) { var v = stageOf(m, i); if (i === 4) h += '<td class="c"><button class="stg fr fr-' + FRAME.indexOf(frameSt(m)) + '" data-act="frame-cycle" data-id="' + m.id + '"' + (canW ? "" : " disabled") + ' aria-label="' + esc(m.name + ", 프레임: " + frameSt(m)) + '">' + frameSt(m).replace("성신 ", "") + (frameStall(m) ? " ⚠" : "") + "</button></td>"; h += '<td class="c"><button class="stg s-' + v + '" data-act="stage" data-id="' + m.id + '" data-k="' + (i - 1) + '"' + (canW ? "" : " disabled") + ' aria-label="' + esc(m.name + ", " + stageName(m, i) + ": " + ST_LABEL[v]) + '">' + ST_LABEL[v] + "</button></td>"; }
       h += '<td><div class="mpct"><span class="mono">' + pct + '%</span><div class="meter"><i style="width:' + pct + '%"></i></div></div></td><td>' + pill(m.post || "작업 중") + '</td><td class="mono sm">' + (DATE_RE.test(m.newTarget || m.target || "") ? (m.newTarget ? '<s class="muted">' + esc(m.target) + "</s> " : "") + esc(m.newTarget || m.target) + (m.delayReason ? '<div class="sm" style="color:var(--warn)">' + esc(m.delayReason) + "</div>" : "") : modEnd(m) ? '<span class="muted">예상</span> ' + esc(modEnd(m)) : '<span class="muted">미정</span>') + "</td></tr>";
     });
@@ -2941,6 +3030,10 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
       case "back": ui.detail = null; ui.day = null; ui.confirm = ""; sr(); break;
       case "open": if (e.target.type === "checkbox") return; openItem(col, id); break;
       case "filt": ui.filt[d.key] = d.v; sr(); break;
+      case "mod-view": modState().view = d.v; modStateSave(); sr(); break;
+      case "mod-grp": modState().grp = d.v; modStateSave(); sr(); break;
+      case "mod-own": modState().own = d.v; sr(); break;
+      case "mod-go": modState().view = d.v || "sched"; modStateSave(); ui.tab = "mods"; ui.detail = null; sr(); break;
       case "theme": { var nx = document.documentElement.getAttribute("data-theme") === "dark" ? "" : "dark"; try { localStorage.setItem("tw-theme", nx); } catch (x) {} if (nx) document.documentElement.setAttribute("data-theme", nx); else document.documentElement.removeAttribute("data-theme"); break; }
       case "add": { if (!canW) return; var data = SC[col].def(); if (PS.indexOf(col) >= 0 && !data.projectId) data.projectId = ui.pid; if (col === "modules") { data.order = D.modules.length + 1; } if (col === "milestones") data.order = D.milestones.length + 1; var nid = create(col, data); if (nid) { D[col].push(Object.assign({ id: nid }, data)); openItem(col, nid); } break; }
       case "del": { var key = col + "/" + id; if (ui.confirm !== key) { ui.confirm = key; sr(); return; } ui.confirm = ""; remove(col, id); D[col] = D[col].filter(function (x) { return x.id !== id; }); ui.detail = null; if (col === "refs") ui.refId = null; sr(); break; }
@@ -3046,11 +3139,12 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
   document.addEventListener("change", function (e) {
     var el = e.target, d = el.dataset;
     if (d.scale) { ui.scale = +el.value || 10; sr(); return; }
+    if (d.modsort) { modState().sort = el.value; modStateSave(); sr(); return; }
     if (d.orgrename !== undefined) { if (!canW) return; D.contacts.forEach(function (c) { if (pidOf(c) === ui.pid && (c.org || "(조직 미지정)") === d.orgrename) { c.org = el.value; patch("contacts", c.id, { org: el.value }); } }); ui.orgOpen[el.value] = true; sr(); return; }
     if (d.orgtype !== undefined) { if (!canW) return; D.contacts.forEach(function (c) { if (pidOf(c) === ui.pid && (c.org || "(조직 미지정)") === d.orgtype) { c.orgType = el.value; patch("contacts", c.id, { orgType: el.value }); } }); sr(); return; }
     if (d.f && d.col) {
       if (!canW) return;
-      var v = el.type === "number" ? (el.value === "" ? null : Number(el.value)) : el.value, obj = {}; obj[d.f] = v;
+      var v = el.type === "number" ? (el.value === "" ? null : Number(el.value)) : el.value, obj = {}; if (d.f === "owner" && (d.col === "modules" || d.col === "tasks")) { v = ownerName(v); if (el.value !== v) el.value = v; } obj[d.f] = v;
       if (d.col === "days") { var ex = byId("days", d.id); if (ex) ex.note = v; else D.days.push({ id: d.id, note: v }); write("days", d.id, function (p) { p.note = v; return p; }); return; }
       var doc = byId(d.col, d.id); if (doc) doc[d.f] = v;
       if (d.col === "meetings" && d.f === "title") { /* 제목 */ }
