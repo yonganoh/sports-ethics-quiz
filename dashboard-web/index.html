@@ -675,6 +675,8 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
 .dg-lc .mono { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .dg-row.dg-g { height: 34px; } .dg-row.dg-g .dg-lc { cursor: default; background: color-mix(in srgb, var(--accent) 10%, var(--surface)); flex-direction: row; align-items: center; gap: 8px; } .dg-row.dg-g .dg-tr { background: color-mix(in srgb, var(--accent) 6%, transparent); } .dg-gl b { white-space: nowrap; }
 .sect-co h2, .sect-team h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; } .sect-co { border-left: 4px solid var(--info, #4a7fb0); } .sect-team { border-left: 4px solid var(--accent); }
 .gfig .sec { fill: color-mix(in srgb, var(--accent) 26%, var(--surface)); stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; } .gfig .sdim { stroke: var(--info); stroke-width: 1.3; fill: none; marker-start: url(#sdm); marker-end: url(#sdm); } .gfig .sext { stroke: var(--muted); stroke-width: 1; fill: none; } .gfig .sax { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 5 4; fill: none; } .gfig .stx { font-size: 13px; font-weight: 700; fill: var(--ink); } .gfig .stk { font-size: 12px; fill: var(--muted); } .gfig .sgc { fill: var(--bad); stroke: var(--surface); stroke-width: 1; }
+.msl { width: 100%; } .msl td { vertical-align: middle; } .msl input[type=text], .msl input[type=date], .msl select { width: 100%; min-width: 0; padding: 7px 9px; font-size: 13.5px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-family: inherit; } .msl input.msl-t { font-weight: 700; } .msl input.msl-d { min-width: 128px; } .msl .msl-dd { white-space: nowrap; } .msl tr.msl-next td { background: color-mix(in srgb, var(--warn) 10%, transparent); } .msl tr.msl-late .msl-dd, .msl tr.msl-late .msl-d { color: var(--bad); } .msl select.st-done { color: var(--ok); } .msl select.st-est { color: var(--info); } .msl.stk td .stv { width: 100%; } @media (min-width: 861px) { .msl th:nth-child(1) { width: 150px; } .msl th:nth-child(3) { width: 96px; } .msl th:nth-child(4) { width: 130px; } .msl th:nth-child(6) { width: 90px; } }
+.stk td.stk-g { display: block; width: 100%; padding: 0; text-align: left; } .mvrow { flex-wrap: wrap; } .mvl { display: flex; align-items: center; gap: 6px; flex: 0 0 100%; margin: 2px 0 0 0; font-size: 12px; color: var(--muted); } .mvl .dt-mv { padding: 5px 8px; font-size: 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-family: inherit; min-width: 0; }
 </style>
 
 <div class="app" id="shell">
@@ -935,7 +937,14 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
   function itemRow(it) {
     var chk = it.k === "todo" || it.k === "ptodo" ? '<input type="checkbox" data-act="' + (it.k === "ptodo" ? "ptodo-toggle" : "todo-toggle") + '" data-id="' + it.id + '"' + (it.done ? " checked" : "") + (canW ? "" : " disabled") + ' aria-label="완료">' : "";
     var open = it.k === "todo" || it.k === "ptodo" ? (canW || it.k === "ptodo" ? ' data-act="todo-edit" data-col="' + it.col + '" data-id="' + it.id + '" title="눌러서 수정"' : "") : ' data-act="open" data-col="' + it.col + '" data-id="' + it.id + '"';
-    return '<li class="row">' + chk + '<span class="tag k-' + it.k + (it.late ? " late" : "") + '">' + it.tag + '</span><button class="go t' + (it.done ? " done" : "") + '"' + open + ">" + esc(it.t) + "</button>" + (open.indexOf("todo-edit") > 0 ? '<button class="btn sm" data-act="todo-edit" data-col="' + it.col + '" data-id="' + it.id + '">수정</button>' : "") + "</li>";
+    var ed = startEd(it);
+    return '<li class="row' + (ed ? " mvrow" : "") + '">' + chk + '<span class="tag k-' + it.k + (it.late ? " late" : "") + '">' + it.tag + '</span><button class="go t' + (it.done ? " done" : "") + '"' + open + ">" + esc(it.t) + "</button>" + (open.indexOf("todo-edit") > 0 ? '<button class="btn sm" data-act="todo-edit" data-col="' + it.col + '" data-id="' + it.id + '">수정</button>' : "") + ed + "</li>";
+  }
+  /* 모듈 시작 · 일정 시작은 그 자리에서 시작일을 바꾼다 */
+  function startEd(it) {
+    if (!canW || (it.tag !== "모듈 시작" && it.tag !== "일정 시작")) return "";
+    var doc = byId(it.col, it.id); if (!doc || !DATE_RE.test(doc.start || "")) return "";
+    return '<label class="mvl"><span>시작일 변경</span><input type="date" class="dt-mv" data-col="' + it.col + '" data-id="' + it.id + '" data-f="start" value="' + esc(doc.start) + '" aria-label="시작일 변경"></label>';
   }
 
   /* ---------- 스키마 (표 + 상세 폼) ---------- */
@@ -1313,7 +1322,30 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
     return h + '</tbody></table></div></div><ul class="plines"><li>단계 칸을 누르면 <b>대기 → 진행 → 완료 → 해당없음</b> 순으로 바뀝니다.</li><li><b>프레임</b> 칸은 성신 협의 상태입니다. 누르면 미착수 → 협의 중 → 설계 중 → 확인 대기 → 확정 → 해당없음 순으로 바뀌고, 진척률에는 넣지 않습니다.</li><li><b>2D 도면화</b>는 발표·발주 바로 앞 단계입니다.</li><li>외주 모듈은 단계를 이렇게 읽습니다: 입력·사양 = 외주 사양 확정 / 선행 설계 = 인터페이스 수신 / 모델링 = 취부 모델링</li><li>모듈 이름을 누르면 상세 페이지가 열립니다.</li></ul>';
   }
   /* --- 일정: 전체 스케줄 → 토글 → 모듈별 일정 --- */
+  /* --- 전체 일정: 목록(기본, 바로 수정) / 간트 --- */
+  function schedList(p) {
+    var all = inP("milestones"), tn = TN(), MS_ST = [["plan", "계획"], ["est", "예상"], ["done", "완료"], ["tbd", "미정"]];
+    var dated = all.filter(function (m) { return m.date; }).sort(byDate), tbd = all.filter(function (m) { return !m.date; });
+    var past = dated.filter(function (m) { return m.status === "done" && dnum(m.date) < tn; }), up = dated.filter(function (m) { return past.indexOf(m) < 0; });
+    var nextId = (up.filter(function (m) { return m.status !== "done" && dnum(m.date) >= tn; })[0] || {}).id;
+    var inp = function (m, f, v, cls, ph) { return '<input type="' + (f === "date" ? "date" : "text") + '" class="' + (cls || "") + '" data-col="milestones" data-id="' + m.id + '" data-f="' + f + '" value="' + esc(v == null ? "" : v) + '"' + (ph ? ' placeholder="' + ph + '"' : "") + (canW ? "" : " disabled") + ' aria-label="' + f + '">'; };
+    var row = function (m) {
+      var st = m.status || "plan", n = m.date ? dnum(m.date) - tn : null, late = m.date && st !== "done" && n < 0, kids = inP("tasks").filter(function (t) { return t.milestoneId === m.id; }).length;
+      var sel = '<select data-col="milestones" data-id="' + m.id + '" data-f="status" class="msl-st st-' + st + '"' + (canW ? "" : " disabled") + ' aria-label="상태">' + MS_ST.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === st ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select>";
+      return '<tr class="' + (m.id === nextId ? "msl-next" : "") + (late ? " msl-late" : "") + '"><td>' + inp(m, "date", m.date, "msl-d") + '</td><td>' + (m.id === nextId ? '<span class="bdg warn">다음</span> ' : "") + inp(m, "title", m.title, "msl-t", "일정 이름") + '</td><td>' + sel + '</td><td class="sm msl-dd">' + (m.date ? (st === "done" ? "—" : esc(ddText(m.date))) + (late ? " · 기한 지남" : "") : "—") + (m.precision === "m" ? '<div class="muted">월 단위(대략)</div>' : "") + (kids ? '<div class="muted">모듈 일정 ' + kids + "개</div>" : "") + '</td><td>' + inp(m, "note", m.note, "", "비고") + "</td><td>" + delBtn("milestones", m.id) + "</td></tr>";
+    };
+    var grp = function (t, n) { return '<tr class="grp-r"><td colspan="6"><b>' + t + '</b> <span class="sm muted">' + n + "개</span></td></tr>"; };
+    var body = "";
+    if (up.length) body += grp("다가오는 일정", up.length) + up.map(row).join("");
+    if (tbd.length) body += grp("날짜 미정", tbd.length) + tbd.map(row).join("");
+    if (ui.showPast && past.length) body += grp("지난 일정 (완료)", past.length) + past.map(row).join("");
+    var h = '<div class="toolbar-row"><div class="chips" role="group" aria-label="보기"><button class="chip" data-act="sched-view" data-v="list" aria-pressed="true">목록</button><button class="chip" data-act="sched-view" data-v="gantt" aria-pressed="false">간트 차트</button></div><div class="acts">' + (past.length ? '<button class="btn" data-act="ms-past">' + (ui.showPast ? "지난 일정 숨기기" : "지난 일정 " + past.length + "개 보기") + "</button>" : "") + addBtn("milestones", "일정 추가") + "</div></div>";
+    h += '<div class="card"><h2>전체 일정 <span class="sm muted">회사 프로젝트 일정</span></h2><p class="sm muted" style="margin:0 0 10px">날짜 · 이름 · 상태 · 비고를 칸에서 바로 고치세요. 날짜를 바꾸면 순서가 자동으로 정리됩니다. 모듈별 일정은 간트 차트에서 봅니다.</p>' +
+      (body ? '<div class="tw"><table class="msl"><thead><tr><th>날짜</th><th>일정</th><th>상태</th><th>남은 기간</th><th>비고</th><th>삭제</th></tr></thead><tbody>' + body + "</tbody></table></div>" : '<div class="empty">등록된 일정이 없습니다. 일정 추가를 눌러 주세요.</div>') + "</div>";
+    return h;
+  }
   function wsSched(p) {
+    if (ui.schedView !== "gantt") return schedList(p);
     var ms = inP("milestones").filter(function (m) { return m.date; }).sort(byDate), tbd = inP("milestones").filter(function (m) { return !m.date; });
     var tasks = inP("tasks"), tn = TN(), LW = 260, allMs = ms, hiddenPast = 0;
     if (!ui.showPast) { ms = allMs.filter(function (m) { return !(m.status === "done" && dnum(m.date) < tn - 14); }); hiddenPast = allMs.length - ms.length; }
@@ -1351,7 +1383,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
     var orphan = tasks.filter(function (t) { return !t.milestoneId || !ms.some(function (m) { return m.id === t.milestoneId; }); }).sort(byStart);
     if (orphan.length) rows += '<div class="sr grp"><div class="sl"><span class="tg"></span><span class="ml">마일스톤 미지정 일정</span><span class="cnt">' + orphan.length + '</span></div><div class="st" style="width:' + W + 'px"></div></div>' + orphan.map(kidRow).join("");
     var gantt = ms.length || tasks.length ? '<div class="dg-wrap"><div class="dg" style="--dgl:' + LW + "px;width:" + (LW + W) + 'px"><div class="dg-head"><div class="dg-hl">전체 스케줄 · 모듈별 일정</div><div class="dg-ht" style="width:' + W + 'px"><div class="dg-m">' + months + '</div><div class="dg-w">' + weeks + '</div></div></div><div class="dg-body"><div class="dg-grid" style="left:' + LW + "px;width:" + W + 'px">' + grid + '</div><div class="sbg" style="left:' + LW + "px;width:" + W + 'px">' + off + '</div><div class="dg-today" style="left:' + (LW + posx(tn) + dw / 2) + 'px"><b>오늘</b></div>' + rows + "</div></div></div>" : '<div class="card"><div class="empty">' + (LOADED.milestones ? "마일스톤이 없습니다. 마일스톤을 추가하세요." : "불러오는 중…") + "</div></div>";
-    var h = '<div class="toolbar-row"><div class="sm muted">▸를 누르면 그 마일스톤 안의 <b>모듈별 일정</b>이 열립니다.<br>막대나 제목을 누르면 아래에서 수정합니다.</div><div class="acts"><label class="sm muted" for="scaleSel">배율</label><select id="scaleSel" class="btn" data-scale="1"><option value="6"' + (dw === 6 ? " selected" : "") + '>좁게</option><option value="10"' + (dw === 10 ? " selected" : "") + '>보통</option><option value="16"' + (dw === 16 ? " selected" : "") + '>넓게</option></select>' + (hiddenPast || ui.showPast ? '<button class="btn" data-act="ms-past">' + (ui.showPast ? "지난 일정 숨기기" : "지난 일정 " + hiddenPast + "개 보기") + "</button>" : "") + '<button class="btn" data-act="ms-all" data-v="1">모두 펼치기</button><button class="btn" data-act="ms-all" data-v="0">모두 접기</button>' + addBtn("milestones", "마일스톤 추가") + "</div></div>" + gantt;
+    var h = '<div class="toolbar-row"><div class="chips" role="group" aria-label="보기"><button class="chip" data-act="sched-view" data-v="list" aria-pressed="false">목록</button><button class="chip" data-act="sched-view" data-v="gantt" aria-pressed="true">간트 차트</button></div></div><div class="toolbar-row"><div class="sm muted">▸를 누르면 그 마일스톤 안의 <b>모듈별 일정</b>이 열립니다.<br>막대나 제목을 누르면 아래에서 수정합니다.</div><div class="acts"><label class="sm muted" for="scaleSel">배율</label><select id="scaleSel" class="btn" data-scale="1"><option value="6"' + (dw === 6 ? " selected" : "") + '>좁게</option><option value="10"' + (dw === 10 ? " selected" : "") + '>보통</option><option value="16"' + (dw === 16 ? " selected" : "") + '>넓게</option></select>' + (hiddenPast || ui.showPast ? '<button class="btn" data-act="ms-past">' + (ui.showPast ? "지난 일정 숨기기" : "지난 일정 " + hiddenPast + "개 보기") + "</button>" : "") + '<button class="btn" data-act="ms-all" data-v="1">모두 펼치기</button><button class="btn" data-act="ms-all" data-v="0">모두 접기</button>' + addBtn("milestones", "마일스톤 추가") + "</div></div>" + gantt;
     h += '<div class="dg-legend"><span>◆ 마일스톤(완료 녹색, 점선은 예상)</span><span><i class="sg doing"></i>하위 일정 범위와 완료율</span><span style="color:var(--bad)">빨간 테두리 = 마감 지남</span><span>음영 = 주말·공휴일</span></div>';
     if (ui.selTask && byId("tasks", ui.selTask)) h += '<div class="card"><h2>모듈 일정 수정 <button class="linkbtn" data-act="sel-clear">닫기</button></h2>' + formHtml("tasks", byId("tasks", ui.selTask)) + '<div class="acts" style="margin-top:12px">' + delBtn("tasks", ui.selTask) + "</div></div>";
     else if (ui.selMs && byId("milestones", ui.selMs)) h += '<div class="card"><h2>마일스톤 수정 <button class="linkbtn" data-act="sel-clear">닫기</button></h2>' + formHtml("milestones", byId("milestones", ui.selMs)) + '<div class="acts" style="margin-top:12px">' + delBtn("milestones", ui.selMs) + "</div></div>";
@@ -1758,7 +1790,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
       if (tb.classList.contains("stk") || tb.dataset.nostk) return; var hs = tb.querySelectorAll("thead th"); if (hs.length < 3) { tb.dataset.nostk = "1"; return; }
       var labs = [].map.call(hs, function (h) { return h.textContent.replace(/\s+/g, " ").trim(); }), prev = [];
       [].forEach.call(tb.querySelectorAll("tbody tr"), function (tr) { [].forEach.call(tr.children, function (td, i) {
-        if (td.tagName !== "TD") return; td.setAttribute("data-label", labs[i] || "");
+        if (td.tagName !== "TD") return; if (td.colSpan > 1) { td.classList.add("stk-g"); return; } td.setAttribute("data-label", labs[i] || "");
         var empty = !td.textContent.trim() && !td.querySelector("svg,input,button,img");
         if (empty && i === 0 && prev[0]) { td.innerHTML = '<span class="stv muted">' + prev[0] + "</span>"; td.classList.add("stk-c"); }
         else if (empty) td.classList.add("stk-e");
@@ -3225,6 +3257,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
       case "back": ui.detail = null; ui.day = null; ui.confirm = ""; sr(); break;
       case "open": if (e.target.type === "checkbox") return; openItem(col, id); break;
       case "filt": ui.filt[d.key] = d.v; sr(); break;
+      case "sched-view": ui.schedView = d.v === "gantt" ? "gantt" : "list"; sr(); break;
       case "mod-view": modState().view = d.v; modStateSave(); sr(); break;
       case "mod-grp": modState().grp = d.v; modStateSave(); sr(); break;
       case "mod-own": modState().own = d.v; sr(); break;
@@ -3341,6 +3374,7 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
       if (!canW) return;
       var v = el.type === "number" ? (el.value === "" ? null : Number(el.value)) : el.value, obj = {}; if (d.f === "owner" && (d.col === "modules" || d.col === "tasks")) { v = ownerName(v); if (el.value !== v) el.value = v; } obj[d.f] = v;
       if (d.col === "days") { var ex = byId("days", d.id); if (ex) ex.note = v; else D.days.push({ id: d.id, note: v }); write("days", d.id, function (p) { p.note = v; return p; }); return; }
+      if (d.col === "tasks" && d.f === "start") { var tk = byId("tasks", d.id); if (tk && DATE_RE.test(v || "") && DATE_RE.test(tk.end || "") && tk.end < v) { obj.end = v; tk.end = v; toast("마감일이 시작일보다 빨라서 같이 옮겼습니다"); } }
       var doc = byId(d.col, d.id); if (doc) doc[d.f] = v;
       if (d.col === "meetings" && d.f === "title") { /* 제목 */ }
       patch(d.col, d.id, obj); if (el.tagName === "SELECT" || el.type === "date") sr(); return;
