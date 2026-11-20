@@ -883,8 +883,11 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   var FRAMEC = ["muted", "warn", "info", "bad", "ok", "muted"];
   var frameSt = function (m) { return FRAME.indexOf(m.frameSt) >= 0 ? m.frameSt : "미착수"; };
   var frameWait = function (m) { var f = frameSt(m); return f === "성신 협의 중" || f === "성신 확인 대기"; };
+  /* 프레임(성신 협의)은 그 기능을 켠 프로젝트에서만 쓴다. 종검은 기본 사용 */
+  var usesFrame = function (pid) { var p = byId("projects", pid); return !!p && (p.frame === "on" || (p.frame == null && p.id === DEFP)); };
   var frameStall = function (m) { return frameWait(m) && m.frameChanged && diff(TODAY(), m.frameChanged) >= 14; };
   function frameCard(m) {
+    if (!usesFrame(pidOf(m))) return "";
     var f = frameSt(m), dis = canW ? "" : " disabled";
     return '<div class="card"><div class="subt"><span>프레임 · 성신 협의</span><span class="muted sm">마지막 변경 ' + fmtY(m.frameChanged) + (frameStall(m) ? ' · <b style="color:var(--bad)">14일 이상 변화 없음</b>' : "") + '</span></div>' +
       '<ul class="plines" style="margin:0 0 10px"><li>모듈 선행 설계와 <b>따로</b> 진행하는 프레임(취부·접속부) 상태입니다.</li><li>성신 답을 기다리는 상태면 홈과 대시보드의 "프레임 협의 현황"에 모입니다.</li></ul>' +
@@ -892,6 +895,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       '<div class="fgrid" style="margin-top:12px"><div class="fld"><label for="f-frameDue">성신 회신 기한</label><input type="date" id="f-frameDue" data-col="modules" data-id="' + m.id + '" data-f="frameDue" value="' + esc(m.frameDue) + '"' + dis + '></div><div class="fld w"><label for="f-frameNote">프레임 협의 내용 (접속점, 보 위치, 용접 브라켓, 하중 등)</label><textarea id="f-frameNote" data-col="modules" data-id="' + m.id + '" data-f="frameNote" rows="4"' + dis + ">" + esc(m.frameNote) + "</textarea></div></div></div>";
   }
   function frameBoard(mods, compact) {
+    mods = mods.filter(function (m) { return usesFrame(pidOf(m)); }); if (!mods.length) return "";
     var cnt = FRAME.map(function (x) { return mods.filter(function (m) { return frameSt(m) === x; }).length; });
     var wait = mods.filter(frameWait).sort(function (a, b) { return (a.frameDue || "9") < (b.frameDue || "9") ? -1 : 1; });
     var h = '<div class="card"><h2>프레임 협의 현황 (성신) <button class="linkbtn" data-act="ws-open" data-id="' + ui.pid + '" data-tab="mods">모듈 표 →</button></h2><div class="hbadges" style="margin-bottom:8px">' + FRAME.map(function (x, i) { return cnt[i] ? '<span class="pill p-' + (PILLC[x] || "gray") + '">' + x + " " + cnt[i] + "</span>" : ""; }).join("") + "</div>";
@@ -917,7 +921,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       if (m.start === d) r.push({ k: "mod", t: pshort(m) + shortCode(m) + " 시작", tag: "모듈 시작", col: "modules", id: m.id });
       if ((m.newTarget || m.target) === d) r.push({ k: "mod", t: pshort(m) + shortCode(m) + " 목표일", tag: "모듈 목표", col: "modules", id: m.id, done: modPct(m) === 100 });
     });
-    D.modules.forEach(function (m) { if (m.frameDue === d && frameWait(m)) r.push({ k: "iss", t: pshort(m) + shortCode(m) + " 프레임 성신 회신", tag: "프레임 기한", col: "modules", id: m.id }); });
+    D.modules.forEach(function (m) { if (m.frameDue === d && frameWait(m) && usesFrame(pidOf(m))) r.push({ k: "iss", t: pshort(m) + shortCode(m) + " 프레임 성신 회신", tag: "프레임 기한", col: "modules", id: m.id }); });
     D.tasks.forEach(function (t) {
       var mm = byId("modules", t.moduleId), nm = (mm ? shortCode(mm) + " " : "") + (t.title || "");
       if (t.start === d) r.push({ k: "mod", t: pshort(t) + nm + " 시작", tag: "일정 시작", col: "tasks", id: t.id, done: t.status === "done" });
@@ -981,7 +985,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     tasks: { name: "모듈 일정", title: "title", back: "일정", fields: [
       { f: "title", l: "일정", t: "text", w: 1 }, { f: "moduleId", l: "모듈", t: "mod" }, { f: "milestoneId", l: "소속 마일스톤", t: "msel" }, { f: "owner", l: "담당", t: "text" }, { f: "start", l: "시작일", t: "date" }, { f: "end", l: "종료일", t: "date" },
       { f: "status", l: "상태", t: "sel", o: [["wait", "대기"], ["run", "진행"], ["done", "완료"]] }, { f: "note", l: "메모", t: "area", w: 1 }] },
-    projects: { name: "프로젝트", title: "name", back: "프로젝트", fields: [{ f: "name", l: "프로젝트명", t: "text" }, { f: "vehicleCo", l: "차량 업체", t: "text" }, { f: "due", l: "납기", t: "date" }, { f: "unit", l: "구성 단위 이름 (비우면 모듈, 예: 파트)", t: "text" }] },
+    projects: { name: "프로젝트", title: "name", back: "프로젝트", fields: [{ f: "name", l: "프로젝트명", t: "text" }, { f: "vehicleCo", l: "차량 업체", t: "text" }, { f: "due", l: "납기", t: "date" }, { f: "unit", l: "구성 단위 이름 (비우면 모듈, 예: 파트)", t: "text" }, { f: "frame", l: "프레임 협의 (성신)", t: "sel", o: [["off", "사용 안 함"], ["on", "사용"]] }] },
     calcs: { name: "공식", title: "name", back: "설계 계산", fields: [
       { f: "name", l: "공식명", t: "text" }, { f: "cat", l: "분류", t: "sel", o: ["열량", "아이솔레이트", "구조해석", "기타"] }, { f: "formula", l: "공식", t: "area", w: 1, r: 2 },
       { f: "vars", l: "변수·단위", t: "area", w: 1 }, { f: "example", l: "사용 예시", t: "area", w: 1 }, { f: "src", l: "출처·비고", t: "text", w: 1 }], def: function () { return { name: "새 공식", cat: "기타" }; } }
@@ -1308,24 +1312,24 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     if (S.own && S.own !== "미지정" && OL.names.indexOf(S.own) < 0) S.own = ""; if (S.own === "미지정" && !OL.none) S.own = "";
     var base = modSorted(ui.pid).filter(function (m) { return f === "전체" || (f === "자체" && m.kind !== "ext") || (f === "외주" && m.kind === "ext") || (f === "프레임 협의 중" && frameWait(m)); });
     var mods = modSortList(base.filter(function (m) { var o = modOwners(m); return !S.own || (S.own === "미지정" ? !o.length : o.indexOf(S.own) >= 0); }), S.sort);
-    var h = '<div class="toolbar-row">' + chipsHtml("mod", ["전체", "자체", "외주", "프레임 협의 중"]) + addBtn("modules", "모듈 추가") + "</div>";
+    var h = '<div class="toolbar-row">' + chipsHtml("mod", usesFrame(ui.pid) ? ["전체", "자체", "외주", "프레임 협의 중"] : ["전체", "자체", "외주"]) + addBtn("modules", "모듈 추가") + "</div>";
     var seg = function (act, cur, opts) { return '<div class="chips" role="group">' + opts.map(function (o) { return '<button class="chip" data-act="' + act + '" data-v="' + o[0] + '" aria-pressed="' + (cur === o[0]) + '">' + o[1] + "</button>"; }).join("") + "</div>"; };
     h += '<div class="mod-ctl"><div class="mc-row"><span class="sm muted">보기</span>' + seg("mod-view", S.view, [["stage", "단계"], ["sched", "일정"]]) + '<span class="sm muted">묶기</span>' + seg("mod-grp", S.grp, [["all", "전체"], ["owner", "담당자별"]]) +
       '<label class="sm muted" for="modSort">정렬</label><select id="modSort" data-modsort="1">' + MSORT.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === S.sort ? " selected" : "") + ">" + x[1] + "</option>"; }).join("") + '</select></div>' +
       '<div class="mc-row"><span class="sm muted">담당자</span><div class="chips"><button class="chip" data-act="mod-own" data-v="" aria-pressed="' + (!S.own) + '">전체</button>' + OL.names.map(function (n) { return '<button class="chip" data-act="mod-own" data-v="' + esc(n) + '" aria-pressed="' + (S.own === n) + '">' + esc(n) + "</button>"; }).join("") + (OL.none ? '<button class="chip" data-act="mod-own" data-v="미지정" aria-pressed="' + (S.own === "미지정") + '">미지정</button>' : "") + "</div></div></div>";
     if (!mods.length) return h + '<div class="card"><div class="empty">' + (LOADED.modules ? "표시할 모듈이 없습니다. 모듈 추가로 등록하거나 필터를 바꿔 보세요." : "불러오는 중…") + "</div></div>";
     if (S.view === "sched") return h + '<div class="card">' + dashGantt(mods, { sort: S.sort, group: S.grp === "owner", only: S.own }) + '</div><ul class="plines"><li>정렬 기준: <b>' + esc((MSORT.filter(function (x) { return x[0] === S.sort; })[0] || MSORT[0])[1]) + "</b>. 날짜가 없는 모듈은 맨 아래에 모입니다.</li>" + (S.grp === "owner" ? "<li>담당자가 두 명인 모듈은 각 담당자 구역에 모두 나옵니다.</li>" : "") + "<li>막대는 시작일부터 단계별 기본 소요일로 계산한 일정입니다. 모듈 이름을 누르면 시작일 · 목표일 · 담당자를 고칠 수 있습니다.</li></ul>";
-    h += '<div class="card board" style="padding:6px 8px"><div class="tw"><table><thead><tr><th>코드</th><th>모듈</th><th>유형</th>' + STAGE_NAMES.map(function (n, i) { return '<th class="c">' + esc(n) + "</th>" + (i === 2 ? '<th class="c">프레임</th>' : ""); }).join("") + "<th>진척</th><th>제출 후</th><th>목표일</th></tr></thead><tbody>";
-    var ncol = 3 + NS + 1 + 3, seq = S.grp === "owner" ? [] : mods.map(function (m) { return { m: m }; });
+    h += '<div class="card board" style="padding:6px 8px"><div class="tw"><table><thead><tr><th>코드</th><th>모듈</th><th>유형</th>' + STAGE_NAMES.map(function (n, i) { return '<th class="c">' + esc(n) + "</th>" + (i === 2 && usesFrame(ui.pid) ? '<th class="c">프레임</th>' : ""); }).join("") + "<th>진척</th><th>제출 후</th><th>목표일</th></tr></thead><tbody>";
+    var ncol = 3 + NS + (usesFrame(ui.pid) ? 1 : 0) + 3, seq = S.grp === "owner" ? [] : mods.map(function (m) { return { m: m }; });
     if (S.grp === "owner") ownerGroups(mods, S.own).forEach(function (g) { seq.push({ g: g }); g.mods.forEach(function (m) { seq.push({ m: m }); }); });
     seq.forEach(function (q) {
       if (q.g) { h += '<tr class="grp-r"><td colspan="' + ncol + '"><b>담당자 : ' + esc(q.g.name) + '</b> <span class="sm muted">모듈 ' + q.g.mods.length + "개 · 평균 " + Math.round(q.g.mods.reduce(function (a, m) { return a + modPct(m); }, 0) / q.g.mods.length) + "%</span></td></tr>"; return; }
       var m = q.m, pct = modPct(m);
       h += '<tr><td class="code">' + esc(shortCode(m)) + '</td><td><button class="mname" data-act="open" data-col="modules" data-id="' + m.id + '">' + esc(m.name) + "</button>" + (stalled(m) ? ' <span class="bdg bad">정체</span>' : "") + '<div class="mowner">' + ownLine(m) + '</div></td><td><span class="kind' + (m.kind === "ext" ? " ext" : "") + '">' + (m.kind === "ext" ? "외주" : "자체") + "</span></td>";
-      for (var i = 1; i <= NS; i++) { var v = stageOf(m, i); if (i === 4) h += '<td class="c"><button class="stg fr fr-' + FRAME.indexOf(frameSt(m)) + '" data-act="frame-cycle" data-id="' + m.id + '"' + (canW ? "" : " disabled") + ' aria-label="' + esc(m.name + ", 프레임: " + frameSt(m)) + '">' + frameSt(m).replace("성신 ", "") + (frameStall(m) ? " ⚠" : "") + "</button></td>"; h += '<td class="c"><button class="stg s-' + v + '" data-act="stage" data-id="' + m.id + '" data-k="' + (i - 1) + '"' + (canW ? "" : " disabled") + ' aria-label="' + esc(m.name + ", " + stageName(m, i) + ": " + ST_LABEL[v]) + '">' + ST_LABEL[v] + "</button></td>"; }
+      for (var i = 1; i <= NS; i++) { var v = stageOf(m, i); if (i === 4 && usesFrame(ui.pid)) h += '<td class="c"><button class="stg fr fr-' + FRAME.indexOf(frameSt(m)) + '" data-act="frame-cycle" data-id="' + m.id + '"' + (canW ? "" : " disabled") + ' aria-label="' + esc(m.name + ", 프레임: " + frameSt(m)) + '">' + frameSt(m).replace("성신 ", "") + (frameStall(m) ? " ⚠" : "") + "</button></td>"; h += '<td class="c"><button class="stg s-' + v + '" data-act="stage" data-id="' + m.id + '" data-k="' + (i - 1) + '"' + (canW ? "" : " disabled") + ' aria-label="' + esc(m.name + ", " + stageName(m, i) + ": " + ST_LABEL[v]) + '">' + ST_LABEL[v] + "</button></td>"; }
       h += '<td><div class="mpct"><span class="mono">' + pct + '%</span><div class="meter"><i style="width:' + pct + '%"></i></div></div></td><td>' + pill(m.post || "작업 중") + '</td><td class="mono sm">' + (DATE_RE.test(m.newTarget || m.target || "") ? (m.newTarget ? '<s class="muted">' + esc(m.target) + "</s> " : "") + esc(m.newTarget || m.target) + (m.delayReason ? '<div class="sm" style="color:var(--warn)">' + esc(m.delayReason) + "</div>" : "") : modEnd(m) ? '<span class="muted">예상</span> ' + esc(modEnd(m)) : '<span class="muted">미정</span>') + "</td></tr>";
     });
-    return h + '</tbody></table></div></div><ul class="plines"><li>단계 칸을 누르면 <b>대기 → 진행 → 완료 → 해당없음</b> 순으로 바뀝니다.</li><li><b>프레임</b> 칸은 성신 협의 상태입니다. 누르면 미착수 → 협의 중 → 설계 중 → 확인 대기 → 확정 → 해당없음 순으로 바뀌고, 진척률에는 넣지 않습니다.</li><li><b>2D 도면화</b>는 발표·발주 바로 앞 단계입니다.</li><li>외주 모듈은 단계를 이렇게 읽습니다: 입력·사양 = 외주 사양 확정 / 선행 설계 = 인터페이스 수신 / 모델링 = 취부 모델링</li><li>모듈 이름을 누르면 상세 페이지가 열립니다.</li></ul>';
+    return h + '</tbody></table></div></div><ul class="plines"><li>단계 칸을 누르면 <b>대기 → 진행 → 완료 → 해당없음</b> 순으로 바뀝니다.</li>' + (usesFrame(ui.pid) ? '<li><b>프레임</b> 칸은 성신 협의 상태입니다. 누르면 미착수 → 협의 중 → 설계 중 → 확인 대기 → 확정 → 해당없음 순으로 바뀌고, 진척률에는 넣지 않습니다.</li>' : "") + '<li><b>2D 도면화</b>는 발표·발주 바로 앞 단계입니다.</li><li>외주 모듈은 단계를 이렇게 읽습니다: 입력·사양 = 외주 사양 확정 / 선행 설계 = 인터페이스 수신 / 모델링 = 취부 모델링</li><li>모듈 이름을 누르면 상세 페이지가 열립니다.</li></ul>';
   }
   /* --- 일정: 전체 스케줄 → 토글 → 모듈별 일정 --- */
   /* --- 전체 일정: 목록(기본, 바로 수정) / 간트 --- */
