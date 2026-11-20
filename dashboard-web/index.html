@@ -889,6 +889,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   var frameWait = function (m) { var f = frameSt(m); return f === "성신 협의 중" || f === "성신 확인 대기"; };
   /* 프레임(성신 협의)은 그 기능을 켠 프로젝트에서만 쓴다. 종검은 기본 사용 */
   var usesFrame = function (pid) { var p = byId("projects", pid); return !!p && (p.frame === "on" || (p.frame == null && p.id === DEFP)); };
+  var unitOf = function (pid) { var p = byId("projects", pid), u = p ? txNorm(p.unit) : ""; return u || "모듈"; };
   var frameStall = function (m) { return frameWait(m) && m.frameChanged && diff(TODAY(), m.frameChanged) >= 14; };
   function frameCard(m) {
     if (!usesFrame(pidOf(m))) return "";
@@ -922,8 +923,8 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     var r = [];
     D.milestones.forEach(function (m) { if ((m.newDate || m.date) === d) r.push({ k: "ms", t: pshort(m) + m.title, tag: "마일스톤", col: "milestones", id: m.id, done: m.status === "done" }); });
     D.modules.forEach(function (m) {
-      if (m.start === d) r.push({ k: "mod", t: pshort(m) + shortCode(m) + " 시작", tag: "모듈 시작", col: "modules", id: m.id });
-      if ((m.newTarget || m.target) === d) r.push({ k: "mod", t: pshort(m) + shortCode(m) + " 목표일", tag: "모듈 목표", col: "modules", id: m.id, done: modPct(m) === 100 });
+      if (m.start === d) r.push({ k: "mod", t: pshort(m) + shortCode(m) + " 시작", tag: unitOf(pidOf(m)) + " 시작", col: "modules", id: m.id });
+      if ((m.newTarget || m.target) === d) r.push({ k: "mod", t: pshort(m) + shortCode(m) + " 목표일", tag: unitOf(pidOf(m)) + " 목표", col: "modules", id: m.id, done: modPct(m) === 100 });
     });
     D.modules.forEach(function (m) { if (m.frameDue === d && frameWait(m) && usesFrame(pidOf(m))) r.push({ k: "iss", t: pshort(m) + shortCode(m) + " 프레임 성신 회신", tag: "프레임 기한", col: "modules", id: m.id }); });
     D.tasks.forEach(function (t) {
@@ -956,7 +957,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   }
   /* 모듈 시작 · 일정 시작은 그 자리에서 시작일을 바꾼다 */
   function startEd(it) {
-    if (!canW || (it.tag !== "모듈 시작" && it.tag !== "일정 시작")) return "";
+    if (!canW || !((it.col === "modules" && / 시작$/.test(it.tag)) || it.tag === "일정 시작")) return "";
     var doc = byId(it.col, it.id); if (!doc || !DATE_RE.test(doc.start || "")) return "";
     return '<label class="mvl"><span>시작일 변경</span><input type="date" class="dt-mv" data-col="' + it.col + '" data-id="' + it.id + '" data-f="start" value="' + esc(doc.start) + '" aria-label="시작일 변경"></label>';
   }
@@ -1122,7 +1123,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       (canW ? '<button class="btn sm" data-act="stage-next" data-id="' + m.id + '"' + (ci ? "" : " disabled") + ">+ 단계 진행</button>" : "") + "</div>";
   }
   function vHome() {
-    var t = TODAY(), d = pd(t), items = itemsOn(t), open = items.filter(function (i) { return !i.done; }), A = alertsInfo(), p = curP();
+    var U = unitOf(ui.pid), t = TODAY(), d = pd(t), items = itemsOn(t), open = items.filter(function (i) { return !i.done; }), A = alertsInfo(), p = curP();
     var nextMs = D.milestones.filter(function (m) { return m.date && m.date >= t && m.status !== "done"; }).sort(byDate);
     var iss = D.issues.filter(function (i) { return i.status !== "닫힘"; }).sort(function (a, b) { return (a.due || "9") < (b.due || "9") ? -1 : 1; });
     var al = [];
@@ -1140,7 +1141,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       mods.forEach(function (m) { var v = stageOf(m, i); if (v === "na") return; tot++; if (v === "done") dn++; else if (v === "doing") dg++; });
       bars += '<div class="bcol"><div class="btrack"><i class="bfill" data-ak="b' + i + '" style="height:' + (tot ? Math.round((dn + dg * .5) / tot * 94) : 0) + '%"></i><span class="tip">' + STAGE_NAMES[i - 1] + " · 완료 " + dn + " · 진행 " + dg + " / " + tot + "</span></div><span>" + i + "</span></div>";
     }
-    h += '<div class="bento1"><div class="card hero"><div><div class="sm muted" style="font-weight:600">전체 진척 (모듈 평균)</div><div class="hnum">' + cnt(avg, "hero") + '<small>%</small></div><div class="hbadges"><span class="bdg run">진행 ' + act + '</span><span class="bdg ok">완료 ' + fin + '</span><span class="bdg mute">대기 ' + (mods.length - act - fin) + "</span>" + (nx ? '<span class="bdg warn">' + esc(nx.title) + " " + ddText(nx.date) + "</span>" : "") + '</div></div><div class="bars" role="img" aria-label="단계별 진척 막대">' + bars + '</div><div class="hero-b"><div class="toolbar-row sm muted" style="font-weight:600"><span>전체 달성률 · 막대는 8단계별 진척</span><span>모듈 ' + mods.length + '개</span></div><div class="meter"><i data-ak="hero" style="width:' + avg + '%"></i></div></div></div>' +
+    h += '<div class="bento1"><div class="card hero"><div><div class="sm muted" style="font-weight:600">전체 진척 (' + U + ' 평균)</div><div class="hnum">' + cnt(avg, "hero") + '<small>%</small></div><div class="hbadges"><span class="bdg run">진행 ' + act + '</span><span class="bdg ok">완료 ' + fin + '</span><span class="bdg mute">대기 ' + (mods.length - act - fin) + "</span>" + (nx ? '<span class="bdg warn">' + esc(nx.title) + " " + ddText(nx.date) + "</span>" : "") + '</div></div><div class="bars" role="img" aria-label="단계별 진척 막대">' + bars + '</div><div class="hero-b"><div class="toolbar-row sm muted" style="font-weight:600"><span>전체 달성률 · 막대는 8단계별 진척</span><span>' + U + ' ' + mods.length + '개</span></div><div class="meter"><i data-ak="hero" style="width:' + avg + '%"></i></div></div></div>' +
       '<div class="card tgls"><h2 style="margin:0">보기 설정</h2>' + TGLS.map(function (x) { return tglHtml(x[0], x[1], x[2]); }).join("") + "</div></div>";
     /* 오늘 · 마일스톤 · 이슈 */
     var list = PREF.hideDone ? open : items, n0 = nextMs[0];
@@ -1153,8 +1154,8 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     h += frameBoard(mods, true);
     /* Row 2: 게이지 그리드 */
     var shown = mods.filter(function (m) { return (PREF.ext || m.kind !== "ext") && !(PREF.hideDone && modPct(m) >= 100); });
-    h += '<div class="subt" style="margin:6px 2px 0"><span style="font-size:16px;font-weight:800">모듈 진행 게이지 (' + shown.length + ")</span><button class='linkbtn' data-act='ws-open' data-id='" + ui.pid + "' data-tab='mods'>단계 표 →</button></div>";
-    h += '<div class="ggrid">' + shown.map(gcard).join("") + (canW ? '<button class="gcard add" data-act="modal-open" data-kind="module"><span class="plus">+</span><span>새 모듈 · 할 일</span></button>' : "") + "</div>";
+    h += '<div class="subt" style="margin:6px 2px 0"><span style="font-size:16px;font-weight:800">' + U + ' 진행 게이지 (' + shown.length + ")</span><button class='linkbtn' data-act='ws-open' data-id='" + ui.pid + "' data-tab='mods'>단계 표 →</button></div>";
+    h += '<div class="ggrid">' + shown.map(gcard).join("") + (canW ? '<button class="gcard add" data-act="modal-open" data-kind="module"><span class="plus">+</span><span>새 ' + U + ' · 할 일</span></button>' : "") + "</div>";
     if (!mods.length && !LOADED.modules) h += '<div class="empty">불러오는 중…</div>';
     var wk = ""; for (var j = 1; j <= 7; j++) { var dd = addDays(t, j), its = itemsOn(dd); if (its.length) wk += '<div class="daygrp">' + fmt(dd) + '</div><ul class="list">' + its.slice(0, 4).map(itemRow).join("") + "</ul>"; }
     h += '<div class="card"><h2>앞으로 7일</h2>' + (wk || '<div class="empty">앞으로 7일 안에 걸린 일정이 없습니다.</div>') + "</div>";
