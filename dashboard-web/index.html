@@ -737,6 +737,10 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   var SKEYS = ["s1", "s2", "s3", "s4", "s5", "s6", "s8", "s7"], NS = SKEYS.length;
   var POST = ["작업 중", "제출됨", "협의 중", "변경 반영 중", "확정"];
   var WHO = ["성신", "협력사", "시스템팀", "전기팀", "대표님·임원", "발주처", "내부"];
+  /* 성신은 종합검측차 II(차량 업체 성신)의 거래처다. 다른 프로젝트의 상대 목록 · 기본값에는 넣지 않는다 */
+  var isSS = function (pid) { var p = byId("projects", pid); return !!p && /성신/.test(p.vehicleCo || ""); };
+  var whoFor = function (pid) { return isSS(pid) ? WHO : WHO.filter(function (x) { return x !== "성신"; }); };
+  var defWho = function (pid) { return isSS(pid) ? "성신" : "협력사"; };
   var MT = { hw: ["HW회의", "HW 회의"], tech: ["장치기술팀", "장치기술팀 회의"], week: ["주간회의", "주간 회의"] };
   var PILLC = { "미착수": "gray", "성신 협의 중": "warn", "설계 중": "info", "성신 확인 대기": "bad", "작업 중": "gray", "제출됨": "info", "협의 중": "warn", "변경 반영 중": "bad", "확정": "ok", "열림": "warn", "답변대기": "info", "닫힘": "ok", "검토중": "info", "승인": "warn", "완료": "ok", "수령": "ok", "대기": "warn", "미회신(2D만)": "bad", "해당없음": "gray" };
 
@@ -971,7 +975,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       cols: [["title", "이슈", "pri"], ["who", "상대"], ["module", "모듈", "mod"], ["due", "회신 기한", "due"], ["status", "상태", "pill"]],
       fields: [{ f: "title", l: "이슈", t: "text", w: 1 }, { f: "projectId", l: "프로젝트", t: "proj" }, { f: "who", l: "상대", t: "sel", o: WHO }, { f: "module", l: "관련 모듈", t: "mod" }, { f: "asked", l: "요청일", t: "date" }, { f: "due", l: "회신 기한", t: "date" },
         { f: "status", l: "상태", t: "sel", o: ISS_ST }, { f: "ecm", l: "연결 ECM 번호", t: "text" }, { f: "body", l: "내용", t: "area", w: 1, r: 5 }, { f: "answer", l: "답변·결과", t: "area", w: 1, r: 5 }],
-      def: function () { return { projectId: ui.pid, title: "새 이슈", who: "성신", status: "열림", asked: TODAY() }; } },
+      def: function () { return { projectId: ui.pid, title: "새 이슈", who: defWho(ui.pid), status: "열림", asked: TODAY() }; } },
     ecm: { name: "ECM", title: "title", back: "ECM", addLabel: "ECM 추가", filter: ["status", ["전체", "검토중", "승인", "완료"]],
       cols: [["no", "번호", "mono"], ["title", "제목", "pri"], ["module", "모듈", "mod"], ["start", "시행일", "date"], ["end", "완료일", "date"], ["status", "상태", "pill"]],
       fields: [{ f: "projectId", l: "프로젝트", t: "proj" }, { f: "no", l: "ECM 번호", t: "text" }, { f: "title", l: "제목", t: "text" }, { f: "status", l: "상태", t: "sel", o: ECM_ST }, { f: "module", l: "연결 모듈", t: "mod" },
@@ -1002,7 +1006,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     if (F.t === "msel") return "<select " + at + '><option value="">—</option>' + inP("milestones", pidOf(doc)).sort(byDate).map(function (m) { return '<option value="' + m.id + '"' + (m.id === v ? " selected" : "") + ">" + esc((m.date || "미정") + " " + m.title) + "</option>"; }).join("") + "</select>";
     if (F.t === "mod") return "<select " + at + '><option value="">—</option>' + modSorted(pidOf(doc)).map(function (m) { return '<option value="' + m.id + '"' + (m.id === v ? " selected" : "") + ">" + esc(shortCode(m) + " " + m.name) + "</option>"; }).join("") + "</select>";
     if (F.t === "sel") {
-      var o = F.o.map(function (x) { return Array.isArray(x) ? x : [x, x]; });
+      var o = (F.o === WHO ? whoFor(pidOf(doc) || ui.pid) : F.o).map(function (x) { return Array.isArray(x) ? x : [x, x]; });
       if (v && !o.some(function (x) { return x[0] === v; })) o.unshift([v, v]);
       return "<select " + at + ">" + o.map(function (x) { return '<option value="' + esc(x[0]) + '"' + (x[0] === v ? " selected" : "") + ">" + esc(x[1]) + "</option>"; }).join("") + "</select>";
     }
@@ -1064,7 +1068,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     h += '<div class="card"><div class="subt"><span>제출·개정 이력 (Rev)</span>' + (canW ? '<button class="btn sm" data-act="rev-add" data-id="' + m.id + '">+ 이력 추가</button>' : "") + "</div>" +
       (revs.length ? '<div class="tw"><table><thead><tr><th>날짜</th><th>Rev</th><th>내용 (누구에게 무엇을 보냈나)</th><th></th></tr></thead><tbody>' + revs.map(function (r, i) {
         return '<tr><td><input class="in" type="date" data-rev="' + i + '" data-rf="date" data-id="' + m.id + '" value="' + esc(r.date) + '"></td><td><input class="in" style="width:70px" data-rev="' + i + '" data-rf="rev" data-id="' + m.id + '" value="' + esc(r.rev) + '"></td><td><input class="in" data-rev="' + i + '" data-rf="note" data-id="' + m.id + '" value="' + esc(r.note) + '"></td><td><button class="btn sm dng" data-act="rev-del" data-id="' + m.id + '" data-i="' + i + '">삭제</button></td></tr>';
-      }).join("") + "</tbody></table></div>" : '<div class="empty">아직 기록이 없습니다. 성신이나 협력사에 도면을 보낼 때마다 한 줄씩 남기면 최신 Rev가 홈과 모듈 카드에 표시됩니다.</div>') + "</div>";
+      }).join("") + "</tbody></table></div>" : '<div class="empty">아직 기록이 없습니다. 거래처나 협력사에 도면을 보낼 때마다 한 줄씩 남기면 최신 Rev가 홈과 모듈 카드에 표시됩니다.</div>') + "</div>";
     h += '<div class="g2"><div class="card"><div class="subt"><span>이 모듈의 협의 이슈 (' + iss.length + ')</span>' + (canW ? '<button class="btn sm" data-act="mod-issue" data-id="' + m.id + '">+ 이슈</button>' : "") + "</div>" +
       (iss.length ? '<ul class="list">' + iss.map(function (i) { return '<li class="row"><button class="go t" data-act="open" data-col="issues" data-id="' + i.id + '">' + esc(i.title) + "</button>" + pill(i.status) + "</li>"; }).join("") + "</ul>" : '<div class="empty">연결된 이슈가 없습니다.</div>') + "</div>" +
       '<div class="card"><div class="subt"><span>이 모듈의 ECM (' + ec.length + ")</span></div>" +
@@ -1165,7 +1169,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     if (k === "edit") { var ed = byId(ui.modal.col, ui.modal.id); if (!ed) { ui.modal = null; m.hidden = true; m.innerHTML = ""; return; }
       h = '<h2>' + (ui.modal.col === "personal" ? "개인 할 일 수정" : "할 일 수정") + '</h2><div class="fld"><label for="ed-title">내용</label><input id="ed-title" type="text" value="' + esc(ed.title) + '"></div><div class="g2 span-f"><div class="fld"><label for="ed-date">시작일</label><input id="ed-date" type="date" value="' + esc(ed.date) + '"></div><div class="fld"><label for="ed-end">종료일 <span class="muted">(여러 날이면)</span></label><input id="ed-end" type="date" value="' + esc(ed.end && ed.end > ed.date ? ed.end : "") + '"></div></div><div class="chips span-q"><button class="btn sm" data-act="ed-ext" data-v="1">+1일 연장</button><button class="btn sm" data-act="ed-ext" data-v="7">+1주 연장</button><button class="btn sm" data-act="ed-tom">내일로 미루기</button><button class="btn sm" data-act="ed-one">하루짜리로</button></div><div class="sm muted" id="ed-span">' + spanText(ed.date, ed.end) + '</div><div class="acts" style="justify-content:space-between"><button class="btn dng" data-act="edit-del">삭제</button><span class="acts"><button class="btn" data-act="modal-close">취소</button><button class="btn pri" data-act="edit-save">저장</button></span></div>'; }
     else if (k === "settings") h = '<h2>설정</h2>' + TGLS.map(function (x) { return tglHtml(x[0], x[1], x[2]); }).join("") + '<div class="tgl"><div><b>조명</b><div class="sm muted">웜 톤과 다크 전환</div></div><button class="btn" data-act="theme">전환</button></div>' + (isAdmin ? '<div class="tgl"><div><b>글자 수정 모드 (관리자)</b><div class="sm muted">화면의 글자를 눌러 직접 고칩니다. 모든 사용자에게 적용</div></div><button class="btn" data-act="tx-on">켜기</button></div>' : "") + '<div class="acts" style="justify-content:flex-end"><button class="btn pri" data-act="modal-close">닫기</button></div>';
-    else h = '<h2>새 항목</h2><div class="seg">' + Object.keys(QK).map(function (x) { return '<button data-act="modal-kind" data-kind="' + x + '" aria-pressed="' + (x === k) + '" style="--c:var(--pri-bg)">' + QK[x][0] + "</button>"; }).join("") + '</div><div class="fld"><label for="qa-title">' + QK[k][0] + (k === "module" ? " 이름" : " 내용") + '</label><input id="qa-title" type="text" value="' + esc(ui.modal.title || "") + '" placeholder="' + (k === "todo" ? "예: 031 방열판 STEP 검토" : k === "issue" ? "예: 성신 접속점 위치 회신" : "예: 차상서버랙") + '"></div><div class="fld"><label for="qa-date">' + QK[k][1] + '</label><input id="qa-date" type="date" value="' + esc(ui.modal.date != null ? ui.modal.date : (k === "todo" ? TODAY() : "")) + '"></div>' + (k === "todo" || k === "ptodo" ? '<div class="fld"><label for="qa-end">종료일 <span class="muted">(여러 날 걸리는 일이면)</span></label><input id="qa-end" type="date" value=""></div>' : "") + '<div class="sm muted">' + (k === "todo" ? "TODO · 달력에 추가됩니다." : esc(curP().name) + " 프로젝트에 추가됩니다.") + '</div><div class="acts" style="justify-content:flex-end"><button class="btn" data-act="modal-close">취소</button><button class="btn pri" data-act="qa-save">추가</button></div>';
+    else h = '<h2>새 항목</h2><div class="seg">' + Object.keys(QK).map(function (x) { return '<button data-act="modal-kind" data-kind="' + x + '" aria-pressed="' + (x === k) + '" style="--c:var(--pri-bg)">' + QK[x][0] + "</button>"; }).join("") + '</div><div class="fld"><label for="qa-title">' + QK[k][0] + (k === "module" ? " 이름" : " 내용") + '</label><input id="qa-title" type="text" value="' + esc(ui.modal.title || "") + '" placeholder="' + (k === "todo" ? "예: 031 방열판 STEP 검토" : k === "issue" ? "예: 접속점 위치 회신" : "예: 차상서버랙") + '"></div><div class="fld"><label for="qa-date">' + QK[k][1] + '</label><input id="qa-date" type="date" value="' + esc(ui.modal.date != null ? ui.modal.date : (k === "todo" ? TODAY() : "")) + '"></div>' + (k === "todo" || k === "ptodo" ? '<div class="fld"><label for="qa-end">종료일 <span class="muted">(여러 날 걸리는 일이면)</span></label><input id="qa-end" type="date" value=""></div>' : "") + '<div class="sm muted">' + (k === "todo" ? "TODO · 달력에 추가됩니다." : esc(curP().name) + " 프로젝트에 추가됩니다.") + '</div><div class="acts" style="justify-content:flex-end"><button class="btn" data-act="modal-close">취소</button><button class="btn pri" data-act="qa-save">추가</button></div>';
     m.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-label="' + (k === "settings" ? "설정" : "새 항목") + '">' + h + "</div>"; m.hidden = false;
     var ti = $("#qa-title") || $("#ed-title"); if (ti) ti.focus();
   }
@@ -1184,7 +1188,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     var title = (($("#qa-title") || {}).value || "").trim(), date = ($("#qa-date") || {}).value || "", qend = ($("#qa-end") || {}).value || "", k = ui.modal.kind, data, col;
     if (!title) { toast("내용을 입력하세요"); return; }
     if (k === "todo") { col = "todos"; data = { title: title, date: date || TODAY(), done: false }; }
-    else if (k === "issue") { col = "issues"; data = { projectId: ui.pid, title: title, who: "성신", status: "열림", asked: TODAY(), due: date }; }
+    else if (k === "issue") { col = "issues"; data = { projectId: ui.pid, title: title, who: defWho(ui.pid), status: "열림", asked: TODAY(), due: date }; }
     else if (k === "ptodo") { if (!uid) { toast("개인 저장공간에 연결되지 않았습니다"); return; } col = "personal"; data = { kind: "todo", title: title, date: date, cat: "todo", done: false, updated: TODAY() }; }
     else { col = "modules"; data = SC.modules.def(); data.name = title; data.target = date; data.order = inP("modules").length + 1; data.changed = TODAY(); }
     if ((k === "todo" || k === "ptodo") && data.date && qend > data.date) data.end = qend;
@@ -1202,7 +1206,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       var mods = inP("modules", p.id), nx = nextMsOf(p.id), avg = avgOf(mods);
       return '<button class="card pcard" data-act="ws-open" data-id="' + p.id + '"><div class="sm muted">' + esc(p.vehicleCo || "차량 업체 미정") + '</div><h2 style="font-size:18px;margin:2px 0 10px">' + esc(p.name) + '</h2><div class="kv"><div><div class="k">납기</div><div class="mono">' + (p.due ? fmtY(p.due) + " · " + ddText(p.due) : "미정") + '</div></div><div><div class="k">모듈 진척</div><div class="mono">' + avg + "% · " + mods.length + '개</div></div></div><div class="meter"><i style="width:' + avg + '%"></i></div><div class="sm muted" style="margin-top:8px">' + (nx ? "다음: " + esc(nx.title) + " · " + ddText(nx.date) : "예정된 마일스톤 없음") + "</div></button>";
     }).join("") + "</div>";
-    if (canW) h += '<div class="card"><h2>새 프로젝트</h2><div class="fgrid"><div class="fld"><label for="np-name">프로젝트명</label><input id="np-name" type="text" placeholder="예: 종합검측차 III"></div><div class="fld"><label for="np-co">차량 업체</label><input id="np-co" type="text" placeholder="예: 성신"></div><div class="fld"><label for="np-due">납기</label><input id="np-due" type="date"></div></div><div class="acts" style="margin-top:12px"><button class="btn pri" data-act="proj-new">프로젝트 만들기</button><span class="sm muted" id="npMsg">' + (mcp ? "Google Drive에 프로젝트 폴더와 하위 폴더 9개도 함께 만듭니다." : "이 화면에서는 Drive에 연결할 수 없어 프로젝트만 만듭니다.") + "</span></div></div>";
+    if (canW) h += '<div class="card"><h2>새 프로젝트</h2><div class="fgrid"><div class="fld"><label for="np-name">프로젝트명</label><input id="np-name" type="text" placeholder="예: 종합검측차 III"></div><div class="fld"><label for="np-co">차량 업체</label><input id="np-co" type="text" placeholder="예: 거래처 이름"></div><div class="fld"><label for="np-due">납기</label><input id="np-due" type="date"></div></div><div class="acts" style="margin-top:12px"><button class="btn pri" data-act="proj-new">프로젝트 만들기</button><span class="sm muted" id="npMsg">' + (mcp ? "Google Drive에 프로젝트 폴더와 하위 폴더 9개도 함께 만듭니다." : "이 화면에서는 Drive에 연결할 수 없어 프로젝트만 만듭니다.") + "</span></div></div>";
     return h;
   }
   function vProjects() {
@@ -1270,7 +1274,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       var m = r.m, f = r.pl[0].s, l = r.pl[r.pl.length - 1].e, left = (f - lo) * dayw, wid = (l - f + 1) * dayw, ci = curStageIdx(m), cur = ci ? stageName(m, ci) : "전 단계 완료", seg = "";
       r.pl.forEach(function (p) { var v = stageOf(m, p.i); seg += '<i class="sg ' + v + '" style="left:' + (p.s - f) * dayw + "px;width:" + (p.e - p.s + 1) * dayw + 'px" title="' + esc(stageName(m, p.i) + " " + dstr(p.s) + " ~ " + dstr(p.e) + " · " + ST_LABEL[v]) + '"></i>'; });
       var late = !r.assumed && DATE_RE.test(m.newTarget || m.target || "") && dstr(l) > (m.newTarget || m.target);
-      html += '<div class="dg-row"><div class="dg-lc" data-act="open" data-col="modules" data-id="' + m.id + '"><span class="mono">' + esc(shortCode(m)) + " · " + ownLine(m) + "</span><b>" + esc(m.name) + '</b></div><div class="dg-tr" style="width:' + W + 'px"><div class="dg-bar' + (r.assumed ? " assumed" : "") + (m.kind === "ext" ? " ext" : "") + (late ? " late" : "") + '" style="left:' + left + "px;width:" + wid + 'px">' + seg + '<span class="dg-pct">' + r.pct + '%</span></div><span class="dg-note" style="left:' + (left + wid + 8) + 'px">' + esc(cur) + (r.assumed ? " · 시작일 미정(오늘 시작 가정)" : " · ~" + dstr(l).slice(5)) + (late ? " · 목표일 초과" : "") + "</span></div></div>";
+      html += '<div class="dg-row"><div class="dg-lc" data-act="open" data-col="modules" data-id="' + m.id + '"><span class="mono">' + esc(shortCode(m)) + " · " + ownLine(m) + "</span><b>" + esc(m.name) + '</b></div><div class="dg-tr" style="width:' + W + 'px"><div class="dg-bar' + (r.assumed ? " assumed" : "") + (m.kind === "ext" ? " ext" : "") + (late ? " late" : "") + '" data-act="open" data-col="modules" data-id="' + m.id + '" style="left:' + left + "px;width:" + wid + 'px;cursor:pointer">' + seg + '<span class="dg-pct">' + r.pct + '%</span></div><span class="dg-note" style="left:' + (left + wid + 8) + 'px">' + esc(cur) + (r.assumed ? " · 시작일 미정(오늘 시작 가정)" : " · ~" + dstr(l).slice(5)) + (late ? " · 목표일 초과" : "") + "</span></div></div>";
     });
     return html + '</div></div></div><div class="dg-legend"><span><i class="sg done"></i>완료</span><span><i class="sg doing"></i>진행</span><span><i class="sg todo"></i>대기</span><span>모듈 이름을 누르면 편집 · 주말·공휴일 제외 표준 소요일 기준 자동 계획</span></div>';
   }
@@ -2990,9 +2994,9 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       F("iso-m", "지지 질량 m", 56, "kg", [["w", "방진구 <b>위에 얹힌 전부</b>의 무게 합계"], ["w", "포함: 하우징 · 카메라/센서 · 조명 · 브라켓 · 볼트 · 케이블 일부"], ["w", "제외: 방진구 아래(프레임·차체)"], ["s", "SolidWorks 어셈블리 → 평가 → 질량 특성"], ["s", "센서 무게는 카탈로그"]]) +
       F("iso-n", "방진구 개수 n", 4, "개", [["w", "모듈 하나를 받치는 방진구 수"], ["w", "하중이 균등하게 나뉜다고 가정"], ["s", "3D 모델의 방진구 위치 수 (보통 모서리 4개)"]]) + "</div>" +
       '<div class="iso-h"><span class="iso-n">2</span>밖에서 들어오는 진동·충격 (차체·대차)</div><div class="fgrid">' +
-      F("iso-f", "줄이고 싶은 진동 주파수 f", 30, "Hz", [["w", "센서에 가장 해로운 진동의 <b>주파수</b>"], ["w", "철도 차량은 대략 5~150 Hz"], ["w", "낮을수록 방진이 어렵습니다"], ["s", "IEC 61373 시험 주파수 범위, 성신·시스템팀 진동 데이터"], ["t", "범위에서 <b>가장 낮은 값</b>을 넣으세요 (안전한 쪽)"]]) +
-      F("iso-ain", "들어오는 진동 가속도", 1, "g", [["w", "차체에서 모듈로 들어오는 진동의 <b>크기</b>"], ["w", "1 g = 9.81 m/s²"], ["s", "IEC 61373 시험 레벨, 성신 진동 데이터"], ["s", "m/s²로 적혀 있으면 9.81로 나누기"], ["t", "1 g로 시작 ([가정])"]]) +
-      F("iso-sh", "충격 가속도 (피크)", 30, "g", [["w", "레일 이음매·분기기에서 오는 <b>순간 충격</b>의 최댓값"], ["w", "진동과 따로 계산합니다"], ["s", "IEC 61373 충격 시험 조건, 성신 요구사양"], ["c", "예시값입니다. 확인 필요 ([가정])"]]) +
+      F("iso-f", "줄이고 싶은 진동 주파수 f", 30, "Hz", [["w", "센서에 가장 해로운 진동의 <b>주파수</b>"], ["w", "철도 차량은 대략 5~150 Hz"], ["w", "낮을수록 방진이 어렵습니다"], ["s", "IEC 61373 시험 주파수 범위, 차량 업체·시스템팀 진동 데이터"], ["t", "범위에서 <b>가장 낮은 값</b>을 넣으세요 (안전한 쪽)"]]) +
+      F("iso-ain", "들어오는 진동 가속도", 1, "g", [["w", "차체에서 모듈로 들어오는 진동의 <b>크기</b>"], ["w", "1 g = 9.81 m/s²"], ["s", "IEC 61373 시험 레벨, 차량 업체 진동 데이터"], ["s", "m/s²로 적혀 있으면 9.81로 나누기"], ["t", "1 g로 시작 ([가정])"]]) +
+      F("iso-sh", "충격 가속도 (피크)", 30, "g", [["w", "레일 이음매·분기기에서 오는 <b>순간 충격</b>의 최댓값"], ["w", "진동과 따로 계산합니다"], ["s", "IEC 61373 충격 시험 조건, 차량 업체 요구사양"], ["c", "예시값입니다. 확인 필요 ([가정])"]]) +
       F("iso-st", "충격 지속시간", 18, "ms", [["w", "충격이 이어지는 시간 (반파 사인 충격으로 계산)"], ["s", "충격 시험 조건표의 pulse duration"], ["c", "예시값입니다 ([가정])"]]) + "</div>" +
       '<div class="iso-h"><span class="iso-n">3</span>센서가 견디는 한계와 여유 공간</div><div class="fgrid">' +
       F("iso-aall", "센서 허용 진동 가속도", 2, "g", [["w", "방진 후 센서에 전달돼도 되는 <b>진동 한계</b>"], ["w", "결과가 이 값보다 작아야 합니다"], ["s", "카메라·센서 데이터시트의 Vibration 사양"], ["s", "센서가 여러 개면 <b>가장 약한 센서</b> 기준"], ["c", "예시값입니다 ([가정])"]]) +
@@ -3257,7 +3261,9 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   document.addEventListener("pointerup", function () { dragEnd(true); });
   document.addEventListener("pointercancel", function () { dragEnd(false); });
   document.addEventListener("click", function (e) { if (swallow) { swallow = false; e.stopPropagation(); e.preventDefault(); } }, true);
-  document.addEventListener("click", function (e) {
+  var lastAct = 0;
+  function onAct(e) {
+    lastAct = performance.now();
     var el = e.target.closest("[data-act]"); if (!el) return;
     var ae = document.activeElement; if (ae && ae !== el && /^(TEXTAREA|INPUT)$/.test(ae.tagName) && ae.closest && ae.closest("#main")) ae.blur();
     var a = el.dataset.act, id = el.dataset.id, col = el.dataset.col, d = el.dataset;
@@ -3287,7 +3293,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       case "post": { if (!canW) return; var m3 = byId("modules", id); m3.post = d.v; m3.changed = TODAY(); patch("modules", id, { post: d.v }); sr(); break; }
       case "rev-add": { var m4 = byId("modules", id), rv = (m4.revs || []).concat([{ date: TODAY(), rev: String.fromCharCode(65 + (m4.revs || []).length), note: "" }]); m4.revs = rv; patch("modules", id, { revs: rv }); sr(); break; }
       case "rev-del": { var m5 = byId("modules", id), rv2 = (m5.revs || []).filter(function (_, i) { return i !== +d.i; }); m5.revs = rv2; patch("modules", id, { revs: rv2 }); sr(); break; }
-      case "mod-issue": { var di = { title: "새 이슈", who: "성신", status: "열림", asked: TODAY(), module: id }, ni = create("issues", di); if (ni) { D.issues.push(Object.assign({ id: ni }, di)); openItem("issues", ni); } break; }
+      case "mod-issue": { var di = { title: "새 이슈", who: defWho(ui.pid), status: "열림", asked: TODAY(), module: id }, ni = create("issues", di); if (ni) { D.issues.push(Object.assign({ id: ni }, di)); openItem("issues", ni); } break; }
       case "contact-add": { var dc = { partnerId: id, name: "", role: "", phone: "", email: "" }, nc = create("contacts", dc); if (nc) { D.contacts.push(Object.assign({ id: nc }, dc)); sr(); } break; }
       case "contact-del": remove("contacts", id); D.contacts = D.contacts.filter(function (x) { return x.id !== id; }); sr(); break;
       case "meet-new": { var T = MT[d.type], today = TODAY(), dm = { projectId: ui.pid, type: T[0], title: "#" + today.slice(2).replace(/-/g, "") + "_" + T[0], date: today, place: "", attendees: "", module: "", agenda: "", discussion: "", decisions: "", actions: [], next: "", transcript: "", summary: "" }, nm = create("meetings", dm); if (nm) { D.meetings.push(Object.assign({ id: nm }, dm)); openItem("meetings", nm); } break; }
@@ -3374,7 +3380,9 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       case "ref-open": ui.refId = id; ui.refEdit = false; sr(); break;
       case "ref-edit": ui.refEdit = !ui.refEdit; sr(); break;
     }
-  });
+  }
+  document.addEventListener("click", onAct);
+  document.addEventListener("twtap", onAct);
   document.addEventListener("change", function (e) {
     var el = e.target, d = el.dataset;
     if (d.scale) { ui.scale = +el.value || 10; sr(); return; }
@@ -3573,6 +3581,35 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   }, true);
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && $("#tw-txed")) { txPanel(null); TX.list = false; } });
 
+  /* 눌러서 쓰는 칸은 모두 "클릭 통과" 표시를 단다.
+     보기 화면의 댓글 기능이 버튼이 아닌 칸(간트 이름, 표 줄 등)의 클릭을 댓글 위치 선택으로 가로채 열리지 않던 문제 */
+  var PASS_SEL = "[data-act], [data-date], .gfig-w, .pcard";
+  function passify() {
+    [].forEach.call(document.querySelectorAll(PASS_SEL), function (el) {
+      if (el.hasAttribute("data-comment-pass")) return;
+      el.setAttribute("data-comment-pass", "");
+      if ((el.tagName === "DIV" || el.tagName === "SPAN" || el.tagName === "LI") && !el.hasAttribute("role") && el.hasAttribute("data-act")) { el.setAttribute("role", "button"); el.setAttribute("tabindex", "0"); }
+    });
+  }
+  (function () {
+    var q = false; function go() { if (q) return; q = true; requestAnimationFrame(function () { q = false; try { passify(); } catch (e) {} }); }
+    try { new MutationObserver(go).observe(document.body, { childList: true, subtree: true }); } catch (e) {}
+    go();
+    document.addEventListener("keydown", function (e) {
+      if ((e.key === "Enter" || e.key === " ") && e.target && e.target.getAttribute && e.target.getAttribute("role") === "button" && e.target.hasAttribute("data-act") && !/^(BUTTON|A|INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) { e.preventDefault(); e.target.click(); }
+    });
+  })();
+
+  /* 탭 보완: 보기 화면의 댓글 기능이 버튼이 아닌 칸의 click 을 가로채도, 손을 뗀 순간(pointerup)에 같은 동작을 실행한다 */
+  (function () {
+    var down = null, NATIVE = /^(BUTTON|A|INPUT|TEXTAREA|SELECT|SUMMARY|OPTION)$/;
+    document.addEventListener("pointerdown", function (e) { if (e.button > 0 || !e.isPrimary) { down = null; return; } var el = e.target && e.target.closest ? e.target.closest("[data-act]") : null; down = el && !NATIVE.test(el.tagName) && !el.closest("button, a, input, select, textarea, summary, label") ? { el: el, x: e.clientX, y: e.clientY } : null; }, true);
+    document.addEventListener("pointerup", function (e) {
+      var d = down; down = null; if (!d || !d.el.isConnected || Math.abs(e.clientX - d.x) > 8 || Math.abs(e.clientY - d.y) > 8) return;
+      var t0 = performance.now(), el = d.el;
+      setTimeout(function () { if (lastAct >= t0 - 5 || !el.isConnected) return; el.dispatchEvent(new CustomEvent("twtap", { bubbles: true, cancelable: true })); }, 90);
+    }, true);
+  })();
   /* ---------- 시작 ---------- */
   try { var th0 = localStorage.getItem("tw-theme"); if (th0) document.documentElement.setAttribute("data-theme", th0); } catch (e) {}
   try { var h0 = location.hash.slice(1); if (VIEWS.indexOf(h0) >= 0) ui.view = h0; } catch (e) {}
