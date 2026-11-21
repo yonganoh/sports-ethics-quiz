@@ -683,6 +683,10 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
 #tw-txed .tx-o span { font-size: 12.5px; color: var(--muted); } #tw-txed .tx-o div { overflow-wrap: anywhere; } #tw-txed .tx-a { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; } #tw-txed .tx-l { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; } #tw-txed .tx-l li { display: flex; gap: 10px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px; } #tw-txed .tx-l div { min-width: 0; overflow-wrap: anywhere; display: grid; } #tw-txed .tx-l s { color: var(--muted); font-size: 12.5px; }
 html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-on #tw-txed * { cursor: auto !important; } html.tx-on #tw-txbar button, html.tx-on #tw-txed button { cursor: pointer !important; }
 .tx-el:not(text):not(tspan) { white-space: normal !important; overflow-wrap: anywhere; height: auto !important; max-width: 100%; text-overflow: clip !important; }
+.idb { display: grid; grid-template-columns: repeat(4, minmax(230px, 1fr)); gap: 14px; align-items: start; overflow-x: auto; padding-bottom: 6px; } .idb-c { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 12px; display: grid; gap: 10px; min-width: 0; } .idb-c h2 { margin: 0 0 2px; font-size: 15px; } .idb-c.st-adopt h2 { color: var(--ok); } .idb-c.st-hold h2 { color: var(--muted); } .idb-c.st-review h2 { color: var(--info); }
+.idea { display: grid; gap: 8px; padding: 10px; border-radius: 14px; background: var(--bg, var(--surface)); border: 1px solid var(--line); border-left: 5px solid var(--muted); min-width: 0; } .idea.pr-high { border-left-color: var(--bad); } .idea.pr-mid { border-left-color: var(--warn); } .idea.pr-low { border-left-color: var(--info, #4a7fb0); }
+.idea .in { width: 100%; box-sizing: border-box; min-width: 0; padding: 7px 9px; font-size: 13.5px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-family: inherit; } .idea .idea-t { font-weight: 700; font-size: 14.5px; } .idea .idea-b { resize: none; overflow: hidden; line-height: 1.5; min-height: 40px; field-sizing: content; } .idea-r { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; } .idea-r .in { flex: 1 1 110px; width: auto; } .idea-r .btn { white-space: normal; text-align: left; }
+@media (max-width: 860px) { .idb { grid-template-columns: 1fr; overflow-x: visible; } }
 </style>
 
 <div class="app" id="shell">
@@ -3177,8 +3181,8 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
 
   /* ---------- 개인 메뉴 (나만 보이는 저장공간: data/users/<내 id>) ---------- */
   var uid = null;
-  var PCATS = [["home", "개인 홈"], ["todo", "할 일"], ["family", "가족 · 집"], ["health", "건강 · 운동"], ["money", "재테크"], ["travel", "여행"], ["hobby", "취미 · 요리"], ["memo", "메모"]];
-  var PHINT = { family: "가족 일정, 아이 행사, 집 관리(관리비 · 수리) 기록", health: "운동 기록, 체중, 병원 · 검진 일정", money: "주식 메모, 적금 · 대출, 가계부 요약", travel: "여행 계획, 숙소 · 예약 정보, 준비물", hobby: "레시피, 취미 기록, 보고 싶은 것", memo: "무엇이든 빠르게 적는 곳" };
+  var PCATS = [["home", "개인 홈"], ["todo", "할 일"], ["family", "가족 · 집"], ["health", "건강 · 운동"], ["money", "재테크"], ["travel", "여행"], ["hobby", "취미 · 요리"], ["memo", "메모"], ["idea", "아이디어 보드"]];
+  var PHINT = { family: "가족 일정, 아이 행사, 집 관리(관리비 · 수리) 기록", health: "운동 기록, 체중, 병원 · 검진 일정", money: "주식 메모, 적금 · 대출, 가계부 요약", travel: "여행 계획, 숙소 · 예약 정보, 준비물", hobby: "레시피, 취미 기록, 보고 싶은 것", memo: "무엇이든 빠르게 적는 곳", idea: "떠오른 아이디어를 칸반으로 정리" };
   var pcatName = function (k) { var r = PCATS.filter(function (x) { return x[0] === k; })[0]; return r ? r[1] : "메모"; };
   var pAll = function (kind) { return D.personal.filter(function (x) { return x.kind === kind; }); };
   function pTodoRow(x) {
@@ -3190,11 +3194,45 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       (cat ? '<input type="hidden" id="pTodoCat" value="' + cat + '">' : '<select class="in" id="pTodoCat" style="max-width:150px" aria-label="분류">' + PCATS.filter(function (x) { return x[0] !== "home"; }).map(function (x) { return '<option value="' + x[0] + '">' + (x[0] === "todo" ? "분류 없음" : x[1]) + "</option>"; }).join("") + "</select>") +
       '<button class="btn pri" data-act="ptodo-add">추가</button></div>';
   }
+  /* ---------- 아이디어 보드 (개인, 칸반) ---------- */
+  var IDEA_ST = [["new", "새 아이디어"], ["review", "검토 중"], ["adopt", "채택"], ["hold", "보류"]];
+  var IDEA_PR = [["high", "높음"], ["mid", "보통"], ["low", "낮음"]];
+  var IDEA_F = { proj: "", tag: "", prio: "" };
+  function ideaCard(x, pn) {
+    var st = IDEA_ST.map(function (s) { return s[0]; }).indexOf(x.status || "new"), at = 'data-col="personal" data-id="' + x.id + '"';
+    var proj = projects().map(function (p) { return '<option value="' + p.id + '"' + (x.proj === p.id ? " selected" : "") + ">" + esc(p.name) + "</option>"; }).join("");
+    return '<div class="idea pr-' + (x.prio || "mid") + '"><input class="in idea-t" type="text" ' + at + ' data-f="title" value="' + esc(x.title || "") + '" placeholder="제목" aria-label="제목">' +
+      '<textarea class="in idea-b" rows="1" ' + at + ' data-f="body" placeholder="내용 — 길어지면 칸이 늘어납니다" aria-label="내용">' + esc(x.body || "") + "</textarea>" +
+      '<div class="idea-r"><select class="in" ' + at + ' data-f="prio" aria-label="우선순위">' + IDEA_PR.map(function (o) { return '<option value="' + o[0] + '"' + ((x.prio || "mid") === o[0] ? " selected" : "") + ">우선 " + o[1] + "</option>"; }).join("") + "</select>" +
+      '<select class="in" ' + at + ' data-f="proj" aria-label="프로젝트"><option value="">공용</option>' + proj + "</select></div>" +
+      '<input class="in idea-g" type="text" ' + at + ' data-f="tag" list="ideaTags" value="' + esc(x.tag || "") + '" placeholder="분류 태그 (예: 설계 팁, 공구)" aria-label="분류 태그">' +
+      '<div class="idea-r"><button class="btn sm" data-act="idea-mv" data-id="' + x.id + '" data-d="-1"' + (st <= 0 ? " disabled" : "") + ' aria-label="이전 칸">◀ ' + (st > 0 ? IDEA_ST[st - 1][1] : "") + '</button><button class="btn sm" data-act="idea-mv" data-id="' + x.id + '" data-d="1"' + (st >= IDEA_ST.length - 1 ? " disabled" : "") + ' aria-label="다음 칸">' + (st < IDEA_ST.length - 1 ? IDEA_ST[st + 1][1] : "") + ' ▶</button>' + delBtn("personal", x.id) + "</div></div>";
+  }
+  function vPIdeas() {
+    var all = pAll("idea"), F = IDEA_F, tags = [], seen = {};
+    all.forEach(function (x) { var t = txNorm(x.tag); if (t && !seen[t]) { seen[t] = 1; tags.push(t); } }); tags.sort();
+    var list = all.filter(function (x) { return (!F.proj || (F.proj === "_" ? !x.proj : x.proj === F.proj)) && (!F.tag || txNorm(x.tag) === F.tag) && (!F.prio || (x.prio || "mid") === F.prio); });
+    var order = { high: 0, mid: 1, low: 2 };
+    list.sort(function (a, b) { return (order[a.prio || "mid"] - order[b.prio || "mid"]) || ((b.updated || "") < (a.updated || "") ? -1 : 1); });
+    var h = head("", "아이디어 보드", "나만 보이는 보드입니다.<br>떠오른 생각을 적어 두고 칸을 옮겨 가며 정리하세요. 칸의 글은 직접 고치면 바로 저장됩니다.", "");
+    h += '<div class="card"><div class="addrow"><input class="in" type="text" id="ideaNew" placeholder="새 아이디어 제목 (Enter)" aria-label="새 아이디어"><button class="btn pri" data-act="idea-add">추가</button></div>' +
+      '<div class="mc-row" style="margin-top:10px"><span class="sm muted">프로젝트</span><select class="in" data-ideaf="proj" aria-label="프로젝트 필터" style="max-width:220px"><option value="">전체</option><option value="_"' + (F.proj === "_" ? " selected" : "") + '>공용</option>' + projects().map(function (p) { return '<option value="' + p.id + '"' + (F.proj === p.id ? " selected" : "") + ">" + esc(p.name) + "</option>"; }).join("") + '</select>' +
+      '<span class="sm muted">태그</span><select class="in" data-ideaf="tag" aria-label="태그 필터" style="max-width:200px"><option value="">전체</option>' + tags.map(function (t) { return '<option value="' + esc(t) + '"' + (F.tag === t ? " selected" : "") + ">" + esc(t) + "</option>"; }).join("") + '</select>' +
+      '<span class="sm muted">우선순위</span><div class="chips">' + [["", "전체"]].concat(IDEA_PR).map(function (o) { return '<button class="chip" data-act="idea-pr" data-v="' + o[0] + '" aria-pressed="' + (F.prio === o[0]) + '">' + o[1] + "</button>"; }).join("") + "</div></div>" +
+      '<datalist id="ideaTags">' + tags.map(function (t) { return '<option value="' + esc(t) + '">'; }).join("") + "</datalist></div>";
+    h += '<div class="idb">' + IDEA_ST.map(function (s) {
+      var col = list.filter(function (x) { return (x.status || "new") === s[0]; });
+      return '<section class="idb-c st-' + s[0] + '" aria-label="' + s[1] + '"><h2>' + s[1] + ' <span class="cnt">' + col.length + "</span></h2>" + (col.length ? col.map(ideaCard).join("") : '<div class="empty">비어 있습니다.</div>') + "</section>";
+    }).join("") + "</div>";
+    return h;
+  }
+  function ideaGrow() { [].forEach.call(document.querySelectorAll("textarea.idea-b"), function (t) { t.style.height = "auto"; t.style.height = Math.max(40, t.scrollHeight + 2) + "px"; }); }
   function vPersonal() {
     if (!uid) return head("", "개인", "") + '<div class="banner">개인 메뉴는 로그인한 본인에게만 보입니다.<br>지금은 개인 저장공간에 연결되지 않았습니다. 로그인한 상태로 열어 주세요.</div>';
     var c = ui.pcat || "home";
     if (c === "home") return vPHome();
     if (c === "todo") return vPTodo();
+    if (c === "idea") return vPIdeas();
     return vPNotes(c);
   }
   function vPHome() {
@@ -3206,7 +3244,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       '<div class="card"><h2>앞으로 2주</h2>' + (up.length ? '<ul class="list">' + up.map(function (x) { return x.kind === "todo" ? pTodoRow(x) : '<li class="row"><span class="tag k-pnote">개인 일정</span><button class="go t" data-act="pnote-open" data-id="' + x.id + '">' + esc(x.title) + '</button><span class="dd">' + fmt(x.date) + "</span></li>"; }).join("") + "</ul>" : '<div class="empty">앞으로 2주 안에 잡힌 일정이 없습니다.<br>메모에 날짜를 넣으면 여기와 달력에 표시됩니다.</div>') + "</div></div>";
     h += '<div class="subt" style="margin:6px 2px 0"><span style="font-size:16px;font-weight:800">분류</span></div><div class="ptiles">' + PCATS.filter(function (x) { return x[0] !== "home" && x[0] !== "todo"; }).map(function (x) {
       var n = notes.filter(function (y) { return y.cat === x[0]; }).length, m = todos.filter(function (y) { return y.cat === x[0] && !y.done; }).length;
-      return '<button class="card ptile" data-act="pcat" data-v="' + x[0] + '"><b>' + x[1] + '</b><span class="sm muted">' + PHINT[x[0]] + '</span><span class="cnt">메모 ' + n + " · 할 일 " + m + "</span></button>";
+      return '<button class="card ptile" data-act="pcat" data-v="' + x[0] + '"><b>' + x[1] + '</b><span class="sm muted">' + PHINT[x[0]] + '</span><span class="cnt">' + (x[0] === "idea" ? "아이디어 " + pAll("idea").length + " · 채택 " + pAll("idea").filter(function (y) { return y.status === "adopt"; }).length : "메모 " + n + " · 할 일 " + m) + "</span></button>";
     }).join("") + "</div>";
     return h;
   }
@@ -3373,6 +3411,9 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       case "p-showdone": ui.pShowDone = !ui.pShowDone; sr(); break;
       case "pnote-add": { var pn = { kind: "note", cat: d.cat, title: "새 메모", body: "", date: "", updated: TODAY() }, pid2 = create("personal", pn); if (pid2) { if (!byId("personal", pid2)) D.personal.push(Object.assign({ id: pid2 }, pn)); ui.pNote = pid2; ui.pEdit = true; sr(); } break; }
       case "pnote-open": { var po = byId("personal", id); if (po) { ui.view = "personal"; ui.pcat = po.cat; ui.pNote = id; ui.pEdit = false; sr(); } break; }
+      case "idea-add": { var it0 = $("#ideaNew"), ti = it0 ? it0.value.trim() : ""; if (!ti) { toast("제목을 적어 주세요"); break; } var idn = { kind: "idea", cat: "idea", title: ti, body: "", status: "new", prio: "mid", proj: (IDEA_F.proj && IDEA_F.proj !== "_") ? IDEA_F.proj : "", tag: IDEA_F.tag || "", updated: TODAY() }, iid = create("personal", idn); if (iid) { if (!byId("personal", iid)) D.personal.push(Object.assign({ id: iid }, idn)); sr(); } break; }
+      case "idea-mv": { var ix = byId("personal", id), ik = IDEA_ST.map(function (q) { return q[0]; }), ni = ik.indexOf(ix && ix.status || "new") + (+d.d); if (ix && ni >= 0 && ni < ik.length) { ix.status = ik[ni]; patch("personal", id, { status: ik[ni] }); sr(); } break; }
+      case "idea-pr": IDEA_F.prio = d.v; sr(); break;
       case "pnote-edit": ui.pEdit = !ui.pEdit; sr(); break;
       case "dict": toggleDict(); break;
       case "ai": runAI(id || (ui.detail && ui.detail.id)); break;
@@ -3387,6 +3428,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   document.addEventListener("change", function (e) {
     var el = e.target, d = el.dataset;
     if (d.scale) { ui.scale = +el.value || 10; sr(); return; }
+    if (d.ideaf) { IDEA_F[d.ideaf] = el.value; sr(); return; }
     if (d.modsort) { modState().sort = el.value; modStateSave(); sr(); return; }
     if (d.orgrename !== undefined) { if (!canW) return; D.contacts.forEach(function (c) { if (pidOf(c) === ui.pid && (c.org || "(조직 미지정)") === d.orgrename) { c.org = el.value; patch("contacts", c.id, { org: el.value }); } }); ui.orgOpen[el.value] = true; sr(); return; }
     if (d.orgtype !== undefined) { if (!canW) return; D.contacts.forEach(function (c) { if (pidOf(c) === ui.pid && (c.org || "(조직 미지정)") === d.orgtype) { c.orgType = el.value; patch("contacts", c.id, { orgType: el.value }); } }); sr(); return; }
@@ -3404,12 +3446,13 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   });
   document.addEventListener("input", function (e) {
     var el = e.target;
+    if (el.classList && el.classList.contains("idea-b")) { el.style.height = "auto"; el.style.height = Math.max(40, el.scrollHeight + 2) + "px"; }
     if (el.dataset.lr !== undefined) { var lk = el.dataset.lr, lrow = (LST[lk] || [])[+el.dataset.li]; if (lrow) { var lf = el.dataset.lf; lrow[lf] = lf === "n" || lf === "v" ? el.value : (el.value === "" ? "" : parseFloat(el.value)); lstSave(lk); if (lk === "el") runElec(); else runBz(); } return; }
     if (el.dataset.bxr !== undefined) { var br = bxLoad()[+el.dataset.bxr]; if (br) { var bf = el.dataset.bxf; br[bf] = bf === "n" ? el.value : (el.value === "" ? "" : parseFloat(el.value)); bxSave(); runBox(); } return; }
     if (el.dataset.calc) { ui.calcv = ui.calcv || {}; ui.calcv[el.id] = el.value; if (el.id === "mot-mech") { sr(); return; } if (el.dataset.rr) { sr(); return; } if (el.id === "gd-proc") { ui.calcv["gd-part"] = "0"; sr(); return; } runCalc(); }
     if (el.id === "refQ") { ui.q = el.value; var q = ui.q.trim().toLowerCase(), cat = ui.filt.ref || "전체", list = sorted("refs", function (a, b) { return (a.title || "") < (b.title || "") ? -1 : 1; }).filter(function (r) { return (cat === "전체" || r.cat === cat) && (!q || ((r.title || "") + (r.body || "")).toLowerCase().indexOf(q) >= 0); }); $("#refList").innerHTML = refList(list, byId("refs", ui.refId)); }
   });
-  document.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.id === "newTodo") { var b = e.target.parentNode.querySelector("[data-act=todo-add]"); if (b) b.click(); } });
+  document.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.id === "ideaNew") { var ib = document.querySelector("[data-act=idea-add]"); if (ib) ib.click(); return; } if (e.key === "Enter" && e.target.id === "newTodo") { var b = e.target.parentNode.querySelector("[data-act=todo-add]"); if (b) b.click(); } });
 
   $("#cmd").addEventListener("input", applyFilter);
   document.addEventListener("keydown", function (e) {
@@ -3593,7 +3636,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     });
   }
   (function () {
-    var q = false; function go() { if (q) return; q = true; requestAnimationFrame(function () { q = false; try { passify(); } catch (e) {} }); }
+    var q = false; function go() { if (q) return; q = true; requestAnimationFrame(function () { q = false; try { passify(); ideaGrow(); } catch (e) {} }); }
     try { new MutationObserver(go).observe(document.body, { childList: true, subtree: true }); } catch (e) {}
     go();
     document.addEventListener("keydown", function (e) {
