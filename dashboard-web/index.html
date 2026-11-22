@@ -739,7 +739,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     ["현황", [["home", "홈"], ["projects", "프로젝트"]]],
     ["협의 · 변경", [["issues", "협의 이슈"], ["ecm", "ECM"], ["partners", "협력사"]]],
     ["일상", [["todo", "TODO · 달력"], ["meetings", "회의록"]]],
-    ["지식", [["refs", "설계 자료실"], ["calcs", "설계 계산"]]]
+    ["지식", [["refs", "설계 자료실"], ["calcs", "설계 계산"], ["rules", "작업 규칙"]]]
   ];
   var VIEW_OF = { milestones: "projects", modules: "projects", issues: "issues", ecm: "ecm", partners: "partners", meetings: "meetings", calcs: "calcs" };
   var STAGE_NAMES = ["입력·사양", "선행 설계", "모델링", "전기 협의", "설계 검토", "조립성", "2D 도면화", "발표·발주"];
@@ -1743,8 +1743,8 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   var REF_CATS = ["용접", "PEM·POP NUT", "평행핀", "기하공차", "표면거칠기", "판금", "방수·방진", "체결·토크", "소재·후처리", "파이프·형강", "전장·케이블", "IEC 61373", "KS 규격", "기타"];
   function vRefs() {
     var cat = ui.filt.ref || "전체", q = (ui.q || "").trim().toLowerCase();
-    var list = sorted("refs", function (a, b) { return (a.title || "") < (b.title || "") ? -1 : 1; }).filter(function (r) { return (cat === "전체" || r.cat === cat) && (!q || ((r.title || "") + (r.body || "")).toLowerCase().indexOf(q) >= 0); });
-    var cur = ui.refId && byId("refs", ui.refId) ? byId("refs", ui.refId) : list[0];
+    var list = sorted("refs", function (a, b) { return (a.title || "") < (b.title || "") ? -1 : 1; }).filter(function (r) { return r.cat !== RULE_CAT && (cat === "전체" || r.cat === cat) && (!q || ((r.title || "") + (r.body || "")).toLowerCase().indexOf(q) >= 0); });
+    var cur = ui.refId && byId("refs", ui.refId) && byId("refs", ui.refId).cat !== RULE_CAT ? byId("refs", ui.refId) : list[0];
     var h = head("", "설계 자료실", "설계 기준을 정리합니다.", addBtn("refs", "문서 추가"));
     h += chipsHtml("ref", ["전체"].concat(REF_CATS));
     var side = '<div class="card" style="padding:10px"><input class="in" id="refQ" type="search" placeholder="제목·내용 검색" value="' + esc(ui.q) + '" aria-label="검색" style="margin-bottom:8px"><div id="refList">' + refList(list, cur) + "</div></div>";
@@ -1766,6 +1766,19 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   }
 
   /* ---------- 설계 계산 ---------- */
+  /* ---------- 작업 규칙 (refs 중 분류가 "작업 지침"인 문서만) ---------- */
+  var RULE_CAT = "작업 지침";
+  function vRules() {
+    var list = sorted("refs", function (a, b) { return a.id === "r01-rules" ? -1 : b.id === "r01-rules" ? 1 : (a.title || "") < (b.title || "") ? -1 : 1; }).filter(function (r) { return r.cat === RULE_CAT; });
+    var cur = ui.ruleId && byId("refs", ui.ruleId) && byId("refs", ui.ruleId).cat === RULE_CAT ? byId("refs", ui.ruleId) : list[0];
+    var h = head("", "작업 규칙", "명령어, 에이전트 편성, 도면·문서 규칙을 모아 둔 곳입니다.", "");
+    var side = '<div class="card" style="padding:10px"><div id="ruleList">' + (list.length ? list.map(function (r) { return '<button class="ritem" data-act="rule-open" data-id="' + r.id + '"' + (cur && cur.id === r.id ? ' aria-current="true"' : "") + "><b style='font-size:13px'>" + esc(r.title) + "</b></button>"; }).join("") : '<div class="empty">' + (LOADED.refs ? "규칙 문서가 없습니다." : "불러오는 중…") + "</div>") + "</div></div>";
+    var view;
+    if (!cur) view = '<div class="card"><div class="empty">' + (LOADED.refs ? "규칙 문서가 없습니다." : "불러오는 중…") + "</div></div>";
+    else if (ui.refEdit && canW) view = '<div class="card"><div class="fgrid"><div class="fld w"><label for="rl-title">제목</label><input id="rl-title" data-col="refs" data-id="' + cur.id + '" data-f="title" value="' + esc(cur.title) + '"></div><div class="fld w"><label for="rl-body">내용 (# 제목, ## 소제목, - 목록, **굵게**)</label><textarea id="rl-body" data-col="refs" data-id="' + cur.id + '" data-f="body" rows="26">' + esc(cur.body) + '</textarea></div></div><div class="acts" style="margin-top:12px"><button class="btn pri" data-act="ref-edit">보기로 돌아가기</button></div></div>';
+    else view = '<div class="card"><div class="acts" style="justify-content:space-between;margin-bottom:6px"><span class="pill p-acc">' + esc(RULE_CAT) + "</span>" + (canW ? '<button class="btn sm" data-act="ref-edit">편집</button>' : "") + '</div><div class="md refmd">' + mdRich(cur.body || "") + "</div></div>";
+    return h + '<div class="refs-lay">' + side + view + "</div>";
+  }
   function vCalcs() {
     if (ui.detail && ui.detail.col === "calcs") return vDetail();
     var cats = ["열량", "아이솔레이트", "구조해석", "기타"], f = ui.filt.calc || "전체", rows = D.calcs.filter(function (c) { return f === "전체" || c.cat === f; }).sort(function (a, b) { return (a.cat || "") < (b.cat || "") ? -1 : 1; });
@@ -3070,8 +3083,8 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   }
 
   /* ---------- 렌더 ---------- */
-  var GROUPS = [["home", "홈", ["home"], ICON.home], ["projects", "프로젝트", ["projects"], ICON.projects], ["talk", "협의 · 변경", ["issues", "ecm", "partners"], ICON.issues], ["daily", "TODO · 회의록", ["todo", "meetings"], ICON.todo], ["me", "개인", ["personal"], "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"], ["know", "자료실 · 계산", ["refs", "calcs"], ICON.refs]];
-  var VNAME = { issues: "협의 이슈", ecm: "ECM", partners: "협력사", todo: "TODO · 달력", meetings: "회의록", refs: "설계 자료실", calcs: "설계 계산" }, LASTV = {};
+  var GROUPS = [["home", "홈", ["home"], ICON.home], ["projects", "프로젝트", ["projects"], ICON.projects], ["talk", "협의 · 변경", ["issues", "ecm", "partners"], ICON.issues], ["daily", "TODO · 회의록", ["todo", "meetings"], ICON.todo], ["me", "개인", ["personal"], "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"], ["know", "자료실 · 계산 · 규칙", ["refs", "calcs", "rules"], ICON.refs]];
+  var VNAME = { issues: "협의 이슈", ecm: "ECM", partners: "협력사", todo: "TODO · 달력", meetings: "회의록", refs: "설계 자료실", calcs: "설계 계산", rules: "작업 규칙" }, LASTV = {};
   function groupOf(v) { for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i][2].indexOf(v) >= 0) return GROUPS[i][0]; return "home"; }
   function pillItems() {
     var g = groupOf(ui.view), ps = projects();
@@ -3142,7 +3155,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     var v = ui.view, h = "";
     if (v === "home") h = vHome(); else if (v === "projects") h = vProjects();
     else if (v === "issues" || v === "ecm" || v === "partners") h = vTable(v); else if (v === "todo") h = vTodo(); else if (v === "meetings") h = vMeetings();
-    else if (v === "refs") h = vRefs(); else if (v === "calcs") h = vCalcs(); else if (v === "personal") h = vPersonal();
+    else if (v === "refs") h = vRefs(); else if (v === "calcs") h = vCalcs(); else if (v === "rules") h = vRules(); else if (v === "personal") h = vPersonal();
     rebuildHol();
     var banner = "";
     if (!db && booted) banner = '<div class="banner">데이터베이스에 연결하지 못했습니다. 새로고침하거나 다시 로그인해 주세요.</div>';
@@ -3563,6 +3576,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       case "ai-redo": { var rid = ui.detail && ui.detail.id; if (!rid) break; if (ui.redoArm !== rid) { ui.redoArm = rid; sr(); setTimeout(function () { if (ui.redoArm === rid) { ui.redoArm = null; sr(); } }, 6000); } else { ui.redoArm = null; runAI(rid, true); } break; }
       case "mt-copy": { var mm = ui.detail && byId("meetings", ui.detail.id); if (!mm) break; var tx = meetText(mm), ok2 = function () { toast("정리 내용을 복사했습니다"); }, fb2 = function () { var ta2 = document.createElement("textarea"); ta2.value = tx; ta2.style.cssText = "position:fixed;left:0;top:0;opacity:0"; document.body.appendChild(ta2); ta2.select(); try { document.execCommand("copy"); ok2(); } catch (x) { toast("복사하지 못했습니다"); } ta2.remove(); }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tx).then(ok2, fb2); else fb2(); break; }
       case "ref-open": ui.refId = id; ui.refEdit = false; sr(); break;
+      case "rule-open": ui.ruleId = id; ui.refEdit = false; sr(); break;
       case "ref-edit": ui.refEdit = !ui.refEdit; sr(); break;
     }
   }
@@ -3593,7 +3607,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     if (el.dataset.lr !== undefined) { var lk = el.dataset.lr, lrow = (LST[lk] || [])[+el.dataset.li]; if (lrow) { var lf = el.dataset.lf; lrow[lf] = lf === "n" || lf === "v" ? el.value : (el.value === "" ? "" : parseFloat(el.value)); lstSave(lk); if (lk === "el") runElec(); else runBz(); } return; }
     if (el.dataset.bxr !== undefined) { var br = bxLoad()[+el.dataset.bxr]; if (br) { var bf = el.dataset.bxf; br[bf] = bf === "n" ? el.value : (el.value === "" ? "" : parseFloat(el.value)); bxSave(); runBox(); } return; }
     if (el.dataset.calc) { ui.calcv = ui.calcv || {}; ui.calcv[el.id] = el.value; if (el.id === "mot-mech") { sr(); return; } if (el.dataset.rr) { sr(); return; } if (el.id === "gd-proc") { ui.calcv["gd-part"] = "0"; sr(); return; } runCalc(); }
-    if (el.id === "refQ") { ui.q = el.value; var q = ui.q.trim().toLowerCase(), cat = ui.filt.ref || "전체", list = sorted("refs", function (a, b) { return (a.title || "") < (b.title || "") ? -1 : 1; }).filter(function (r) { return (cat === "전체" || r.cat === cat) && (!q || ((r.title || "") + (r.body || "")).toLowerCase().indexOf(q) >= 0); }); $("#refList").innerHTML = refList(list, byId("refs", ui.refId)); }
+    if (el.id === "refQ") { ui.q = el.value; var q = ui.q.trim().toLowerCase(), cat = ui.filt.ref || "전체", list = sorted("refs", function (a, b) { return (a.title || "") < (b.title || "") ? -1 : 1; }).filter(function (r) { return r.cat !== RULE_CAT && (cat === "전체" || r.cat === cat) && (!q || ((r.title || "") + (r.body || "")).toLowerCase().indexOf(q) >= 0); }); $("#refList").innerHTML = refList(list, byId("refs", ui.refId)); }
   });
   document.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.id === "newTodo") { var b = e.target.parentNode.querySelector("[data-act=todo-add]"); if (b) b.click(); } });
 
