@@ -683,15 +683,15 @@ body.nomotion .rise, body.nomotion .sheet { animation: none; } body.nomotion .ri
 #tw-txed .tx-o span { font-size: 12.5px; color: var(--muted); } #tw-txed .tx-o div { overflow-wrap: anywhere; } #tw-txed .tx-a { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; } #tw-txed .tx-l { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; } #tw-txed .tx-l li { display: flex; gap: 10px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px; } #tw-txed .tx-l div { min-width: 0; overflow-wrap: anywhere; display: grid; } #tw-txed .tx-l s { color: var(--muted); font-size: 12.5px; }
 html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-on #tw-txed * { cursor: auto !important; } html.tx-on #tw-txbar button, html.tx-on #tw-txed button { cursor: pointer !important; }
 .tx-el:not(text):not(tspan) { white-space: normal !important; overflow-wrap: anywhere; height: auto !important; max-width: 100%; text-overflow: clip !important; }
-.idb { display: grid; grid-template-columns: repeat(4, minmax(230px, 1fr)); gap: 14px; align-items: start; overflow-x: auto; padding-bottom: 6px; } .idb-c { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 12px; display: grid; gap: 10px; min-width: 0; } .idb-c h2 { margin: 0 0 2px; font-size: 15px; } .idb-c.st-adopt h2 { color: var(--ok); } .idb-c.st-hold h2 { color: var(--muted); } .idb-c.st-review h2 { color: var(--info); }
-.idea { display: grid; gap: 8px; padding: 10px; border-radius: 14px; background: var(--bg, var(--surface)); border: 1px solid var(--line); border-left: 5px solid var(--muted); min-width: 0; } .idea.pr-high { border-left-color: var(--bad); } .idea.pr-mid { border-left-color: var(--warn); } .idea.pr-low { border-left-color: var(--info, #4a7fb0); }
-.idea .in { width: 100%; box-sizing: border-box; min-width: 0; padding: 7px 9px; font-size: 13.5px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-family: inherit; } .idea .idea-t { font-weight: 700; font-size: 14.5px; } .idea .idea-b { resize: none; overflow: hidden; line-height: 1.5; min-height: 40px; field-sizing: content; } .idea-r { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; } .idea-r .in { flex: 1 1 110px; width: auto; } .idea-r .btn { white-space: normal; text-align: left; }
-@media (max-width: 860px) { .idb { grid-template-columns: 1fr; overflow-x: visible; } }
-.idb { position: relative; } .idb-svg { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; color: var(--accent); z-index: 3; } .idb-svg path { fill: none; stroke: currentColor; stroke-width: 2.2; opacity: .9; } .idb-svg marker path { fill: currentColor; stroke: none; opacity: 1; }
-.idea-h { display: flex; gap: 6px; align-items: center; } .idea-h .idea-t { flex: 1 1 auto; } .idea-grip { cursor: grab; touch-action: none; flex: 0 0 auto; width: 32px; height: 34px; border: 1px solid var(--line); background: var(--surface); border-radius: 9px; color: var(--muted); font-size: 16px; line-height: 1; padding: 0; } .idea-grip:active { cursor: grabbing; }
-.idea.dragging { position: relative; z-index: 60; opacity: .93; box-shadow: 0 14px 34px rgba(0,0,0,.28); pointer-events: none; } body.idea-dragging, body.idea-dragging * { cursor: grabbing !important; user-select: none; } .idb-c.drop { outline: 2px dashed var(--accent); outline-offset: -2px; background: color-mix(in srgb, var(--accent) 7%, var(--surface)); }
-.idea.pickable { cursor: crosshair; outline: 2px dashed var(--accent); outline-offset: 1px; } .idea.linking { outline: 2px solid var(--accent); outline-offset: 1px; } .idea-bn { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
-.lkrow { display: flex; flex-wrap: wrap; gap: 6px; } .lk { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--line)); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); overflow-wrap: anywhere; } .lk.in { border-color: var(--line); background: var(--surface); color: var(--muted); } .lk button { border: 0; background: transparent; color: inherit; cursor: pointer; padding: 0 2px; font: inherit; }
+.dm-card { padding: 10px; } .dm-tools { display: grid; gap: 8px; margin-bottom: 10px; } .dm-row { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; } .dm-row .in { padding: 6px 9px; font-size: 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-family: inherit; max-width: 100%; } .dm-lin { min-width: 150px; flex: 1 1 150px; } .dm-ck { display: inline-flex; gap: 4px; align-items: center; }
+.dm-sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); cursor: pointer; padding: 0; } .dm-sw.on { border-color: var(--ink); box-shadow: 0 0 0 2px var(--accent); }
+.dm-view { position: relative; height: min(74vh, 760px); overflow: auto; border: 1px solid var(--line); border-radius: 16px; background-color: var(--surface); background-image: radial-gradient(circle, color-mix(in srgb, var(--ink) 22%, transparent) 1px, transparent 1.3px); background-size: 22px 22px; background-attachment: local; touch-action: pan-x pan-y; cursor: grab; } .dm-pad { position: relative; } .dm-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.dm-edges { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; } .dm-e { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; } .dm-e.sel { stroke: var(--accent); stroke-width: 3.2; } .dm-e.dash { stroke-dasharray: 8 6; } .dm-tmp { stroke: var(--accent); stroke-dasharray: 6 5; } .dm-hit { fill: none; stroke: transparent; stroke-width: 18; pointer-events: stroke; cursor: pointer; } .dm-ar { fill: var(--ink); } .dm-ar.s { fill: var(--accent); }
+.dm-lbls { position: absolute; left: 0; top: 0; } .dm-lbl { position: absolute; transform: translate(-50%, -50%); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 2px 9px; font-size: 12.5px; white-space: pre; cursor: pointer; z-index: 2; } .dm-lbl.sel { border-color: var(--accent); } .dm-hint { position: absolute; left: 60px; top: 60px; color: var(--muted); font-size: 14px; line-height: 1.6; pointer-events: none; }
+.dn { position: absolute; display: flex; align-items: center; justify-content: center; box-sizing: border-box; min-width: 120px; max-width: 300px; min-height: 56px; padding: 14px 18px; color: #2b2723; font-size: 14px; line-height: 1.45; font-weight: 600; text-align: center; touch-action: none; user-select: none; cursor: move; z-index: 1; } .dn-round, .dn-rect, .dn-ellipse { background: var(--c); border: 2px solid #3a3530; } .dn-round { border-radius: 16px; } .dn-rect { border-radius: 4px; } .dn-ellipse { border-radius: 50%; padding: 18px 30px; } .dn-diamond { padding: 34px 46px; } .dn-cloud { padding: 28px 38px; } .dn-db { padding: 34px 22px 22px; min-height: 90px; }
+.dn-bg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; } .dn-bg path { fill: var(--c); stroke: #3a3530; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; } .dn-t { position: relative; white-space: pre-wrap; overflow-wrap: anywhere; outline: none; min-width: 40px; pointer-events: none; } .dn.edit { cursor: text; user-select: text; } .dn.edit .dn-t { pointer-events: auto; cursor: text; background: rgba(255,255,255,.55); border-radius: 4px; }
+.dn.sel { outline: 3px solid var(--accent); outline-offset: 4px; } .dn.target { outline: 3px dashed var(--accent); outline-offset: 4px; } .dn-h { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.4); opacity: 0; pointer-events: none; cursor: crosshair; z-index: 3; } .dn-h::after { content: ""; position: absolute; inset: -9px; } .dn.sel .dn-h { opacity: 1; pointer-events: auto; } .dn:hover .dn-h { opacity: 1; pointer-events: auto; }
+.dn-h.h-t { left: 50%; top: -14px; transform: translateX(-50%); } .dn-h.h-b { left: 50%; bottom: -14px; transform: translateX(-50%); } .dn-h.h-l { left: -14px; top: 50%; transform: translateY(-50%); } .dn-h.h-r { right: -14px; top: 50%; transform: translateY(-50%); }
 </style>
 
 <div class="app" id="shell">
@@ -3186,8 +3186,8 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
 
   /* ---------- 개인 메뉴 (나만 보이는 저장공간: data/users/<내 id>) ---------- */
   var uid = null;
-  var PCATS = [["home", "개인 홈"], ["todo", "할 일"], ["family", "가족 · 집"], ["health", "건강 · 운동"], ["money", "재테크"], ["travel", "여행"], ["hobby", "취미 · 요리"], ["memo", "메모"], ["idea", "아이디어 보드"]];
-  var PHINT = { family: "가족 일정, 아이 행사, 집 관리(관리비 · 수리) 기록", health: "운동 기록, 체중, 병원 · 검진 일정", money: "주식 메모, 적금 · 대출, 가계부 요약", travel: "여행 계획, 숙소 · 예약 정보, 준비물", hobby: "레시피, 취미 기록, 보고 싶은 것", memo: "무엇이든 빠르게 적는 곳", idea: "떠오른 아이디어를 칸반으로 정리" };
+  var PCATS = [["home", "개인 홈"], ["todo", "할 일"], ["family", "가족 · 집"], ["health", "건강 · 운동"], ["money", "재테크"], ["travel", "여행"], ["hobby", "취미 · 요리"], ["memo", "메모"], ["dgm", "다이어그램 보드"]];
+  var PHINT = { family: "가족 일정, 아이 행사, 집 관리(관리비 · 수리) 기록", health: "운동 기록, 체중, 병원 · 검진 일정", money: "주식 메모, 적금 · 대출, 가계부 요약", travel: "여행 계획, 숙소 · 예약 정보, 준비물", hobby: "레시피, 취미 기록, 보고 싶은 것", memo: "무엇이든 빠르게 적는 곳", dgm: "상자와 화살표로 구조 · 흐름 · 아이디어 그리기" };
   var pcatName = function (k) { var r = PCATS.filter(function (x) { return x[0] === k; })[0]; return r ? r[1] : "메모"; };
   var pAll = function (kind) { return D.personal.filter(function (x) { return x.kind === kind; }); };
   function pTodoRow(x) {
@@ -3199,48 +3199,174 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       (cat ? '<input type="hidden" id="pTodoCat" value="' + cat + '">' : '<select class="in" id="pTodoCat" style="max-width:150px" aria-label="분류">' + PCATS.filter(function (x) { return x[0] !== "home"; }).map(function (x) { return '<option value="' + x[0] + '">' + (x[0] === "todo" ? "분류 없음" : x[1]) + "</option>"; }).join("") + "</select>") +
       '<button class="btn pri" data-act="ptodo-add">추가</button></div>';
   }
-  /* ---------- 아이디어 보드 (개인, 칸반) ---------- */
-  var IDEA_ST = [["new", "새 아이디어"], ["review", "검토 중"], ["adopt", "채택"], ["hold", "보류"]];
-  var IDEA_PR = [["high", "높음"], ["mid", "보통"], ["low", "낮음"]];
-  var IDEA_F = { proj: "", tag: "", prio: "" }, IDEA_LINK = null, IDEA_DRAG = null;
-  var ordOf = function (x) { return typeof x.ord === "number" ? x.ord : 0; };
-  function ideaCard(x, pn) {
-    var st = IDEA_ST.map(function (s) { return s[0]; }).indexOf(x.status || "new"), at = 'data-col="personal" data-id="' + x.id + '"';
-    var proj = projects().map(function (p) { return '<option value="' + p.id + '"' + (x.proj === p.id ? " selected" : "") + ">" + esc(p.name) + "</option>"; }).join("");
-    var lk = (x.links || []).filter(function (id2) { return byId("personal", id2); }), inc = pAll("idea").filter(function (y) { return (y.links || []).indexOf(x.id) >= 0; });
-    var picking = IDEA_LINK && IDEA_LINK !== x.id, lkRow = lk.length || inc.length ? '<div class="lkrow">' + lk.map(function (id2) { var t2 = byId("personal", id2); return '<span class="lk">→ ' + esc(t2.title || "(제목 없음)") + '<button data-act="idea-unlink" data-id="' + x.id + '" data-to="' + id2 + '" aria-label="연결 지우기">✕</button></span>'; }).join("") + inc.map(function (y) { return '<span class="lk in">← ' + esc(y.title || "(제목 없음)") + "</span>"; }).join("") + "</div>" : "";
-    return '<div class="idea pr-' + (x.prio || "mid") + (picking ? " pickable" : "") + (IDEA_LINK === x.id ? " linking" : "") + '" data-id="' + x.id + '"' + (picking ? ' data-act="idea-pick"' : "") + '><div class="idea-h"><button class="idea-grip" data-idrag="' + x.id + '" aria-label="끌어서 다른 칸으로 옮기기" title="끌어서 다른 칸으로 옮기기">⠿</button><input class="in idea-t" type="text" ' + at + ' data-f="title" value="' + esc(x.title || "") + '" placeholder="제목" aria-label="제목"></div>' +
-      '<textarea class="in idea-b" rows="1" ' + at + ' data-f="body" placeholder="내용 — 길어지면 칸이 늘어납니다" aria-label="내용">' + esc(x.body || "") + "</textarea>" +
-      '<div class="idea-r"><select class="in" ' + at + ' data-f="prio" aria-label="우선순위">' + IDEA_PR.map(function (o) { return '<option value="' + o[0] + '"' + ((x.prio || "mid") === o[0] ? " selected" : "") + ">우선 " + o[1] + "</option>"; }).join("") + "</select>" +
-      '<select class="in" ' + at + ' data-f="proj" aria-label="프로젝트"><option value="">공용</option>' + proj + "</select></div>" +
-      '<input class="in idea-g" type="text" ' + at + ' data-f="tag" list="ideaTags" value="' + esc(x.tag || "") + '" placeholder="분류 태그 (예: 설계 팁, 공구)" aria-label="분류 태그">' +
-      '<div class="idea-r"><button class="btn sm" data-act="idea-mv" data-id="' + x.id + '" data-d="-1"' + (st <= 0 ? " disabled" : "") + ' aria-label="이전 칸">◀ ' + (st > 0 ? IDEA_ST[st - 1][1] : "") + '</button><button class="btn sm" data-act="idea-mv" data-id="' + x.id + '" data-d="1"' + (st >= IDEA_ST.length - 1 ? " disabled" : "") + ' aria-label="다음 칸">' + (st < IDEA_ST.length - 1 ? IDEA_ST[st + 1][1] : "") + ' ▶</button><button class="btn sm' + (IDEA_LINK === x.id ? " pri" : "") + '" data-act="idea-link" data-id="' + x.id + '">↗ 연결' + (IDEA_LINK === x.id ? " 중" : "") + "</button>" + delBtn("personal", x.id) + "</div>" + lkRow + "</div>";
+  /* ---------- 다이어그램 보드 (개인) ----------
+     자유롭게 놓는 상자 + 화살표. 상자는 글에 맞춰 커지고, 상자의 둥근 점을 끌어 다른 상자에 놓으면 화살표가 이어진다. */
+  var DM_COL = [["purple", "보라", "#cdbdf0"], ["yellow", "노랑", "#f1eeb0"], ["pink", "분홍", "#f5c6d6"], ["green", "초록", "#cfe8c2"], ["blue", "하늘", "#bfdcf3"], ["gray", "회색", "#e4e0d8"]];
+  var DM_SH = [["round", "둥근 상자"], ["rect", "상자"], ["ellipse", "원"], ["diamond", "마름모"], ["cloud", "구름"], ["db", "DB(원통)"]];
+  var DM_ST = [["curve", "곡선"], ["elbow", "직각"], ["line", "직선"]], DM_HD = [["end", "→ 한쪽"], ["both", "↔ 양쪽"], ["none", "— 없음"]];
+  var DM = { id: null, sel: null, zoom: 1, undo: [], defStyle: "curve", defHead: "end", editing: null };
+  var dmUid = function () { return "x" + Math.random().toString(36).slice(2, 8); };
+  /* 저장소에서 읽은 값은 잠겨 있어서 고칠 수 있는 복사본으로 바꿔 쓴다 */
+  var dmDoc = function () { var d = DM.id ? byId("personal", DM.id) : null; if (!d || d.kind !== "diagram") return null; if (!d._m) { d.nodes = JSON.parse(JSON.stringify(d.nodes || [])); d.edges = JSON.parse(JSON.stringify(d.edges || [])); d._m = true; } return d; };
+  var dmHex = function (c) { var r = DM_COL.filter(function (x) { return x[0] === c; })[0]; return r ? r[2] : DM_COL[0][2]; };
+  var DM_BG = { diamond: "M50 2L98 50L50 98L2 50Z", cloud: "M24 82C6 82 2 56 20 50C14 28 44 16 55 32C66 12 94 24 86 46C100 52 98 82 78 82Z", db: "M3 14C3 2 97 2 97 14L97 86C97 98 3 98 3 86Z M3 14C3 26 97 26 97 14" };
+  function dmSave(doc) { patch("personal", doc.id, { nodes: doc.nodes, edges: doc.edges }); }
+  function dmSnap(doc) { DM.undo.push(JSON.stringify({ id: doc.id, nodes: doc.nodes, edges: doc.edges })); if (DM.undo.length > 40) DM.undo.shift(); }
+  function dmNodeHtml(n, sel) {
+    var sh = n.shape || "round", bg = DM_BG[sh] ? '<svg class="dn-bg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="' + DM_BG[sh] + '"></path></svg>' : "";
+    return '<div class="dn dn-' + sh + (sel ? " sel" : "") + '" data-nid="' + n.id + '" style="left:' + Math.round(n.x) + "px;top:" + Math.round(n.y) + "px;--c:" + dmHex(n.color) + '">' + bg + '<div class="dn-t">' + esc(n.text || "") + "</div>" + ["t", "r", "b", "l"].map(function (s) { return '<i class="dn-h h-' + s + '" data-hs="' + s + '" data-nid="' + n.id + '"></i>'; }).join("") + "</div>";
   }
-  function vPIdeas() {
-    var all = pAll("idea"), F = IDEA_F, tags = [], seen = {};
-    all.forEach(function (x) { var t = txNorm(x.tag); if (t && !seen[t]) { seen[t] = 1; tags.push(t); } }); tags.sort();
-    var list = all.filter(function (x) { return (!F.proj || (F.proj === "_" ? !x.proj : x.proj === F.proj)) && (!F.tag || txNorm(x.tag) === F.tag) && (!F.prio || (x.prio || "mid") === F.prio); });
-    list.sort(function (a, b) { return (ordOf(a) - ordOf(b)) || ((b.updated || "") < (a.updated || "") ? -1 : 1); });
-    var h = head("", "아이디어 보드", "나만 보이는 보드입니다.<br>떠오른 생각을 적어 두고 칸을 옮겨 가며 정리하세요.<br>카드 머리의 <b>⠿</b>를 끌어 다른 칸 · 순서로 옮기고, <b>↗ 연결</b>로 카드끼리 화살표를 잇습니다. 글은 직접 고치면 바로 저장됩니다.", "");
-    if (IDEA_LINK && byId("personal", IDEA_LINK)) h += '<div class="banner idea-bn"><b>“' + esc(byId("personal", IDEA_LINK).title || "(제목 없음)") + '”</b>에서 이어질 카드를 누르세요. 이미 연결된 카드를 누르면 연결이 지워집니다. <button class="btn sm" data-act="idea-link" data-id="' + IDEA_LINK + '">취소</button></div>';
-    h += '<div class="card"><div class="addrow"><input class="in" type="text" id="ideaNew" placeholder="새 아이디어 제목 (Enter)" aria-label="새 아이디어"><button class="btn pri" data-act="idea-add">추가</button></div>' +
-      '<div class="mc-row" style="margin-top:10px"><span class="sm muted">프로젝트</span><select class="in" data-ideaf="proj" aria-label="프로젝트 필터" style="max-width:220px"><option value="">전체</option><option value="_"' + (F.proj === "_" ? " selected" : "") + '>공용</option>' + projects().map(function (p) { return '<option value="' + p.id + '"' + (F.proj === p.id ? " selected" : "") + ">" + esc(p.name) + "</option>"; }).join("") + '</select>' +
-      '<span class="sm muted">태그</span><select class="in" data-ideaf="tag" aria-label="태그 필터" style="max-width:200px"><option value="">전체</option>' + tags.map(function (t) { return '<option value="' + esc(t) + '"' + (F.tag === t ? " selected" : "") + ">" + esc(t) + "</option>"; }).join("") + '</select>' +
-      '<span class="sm muted">우선순위</span><div class="chips">' + [["", "전체"]].concat(IDEA_PR).map(function (o) { return '<button class="chip" data-act="idea-pr" data-v="' + o[0] + '" aria-pressed="' + (F.prio === o[0]) + '">' + o[1] + "</button>"; }).join("") + "</div></div>" +
-      '<datalist id="ideaTags">' + tags.map(function (t) { return '<option value="' + esc(t) + '">'; }).join("") + "</datalist></div>";
-    h += '<div class="idb"><svg class="idb-svg" aria-hidden="true"></svg>' + IDEA_ST.map(function (s) {
-      var col = list.filter(function (x) { return (x.status || "new") === s[0]; });
-      return '<section class="idb-c st-' + s[0] + '" aria-label="' + s[1] + '"><h2>' + s[1] + ' <span class="cnt">' + col.length + "</span></h2>" + (col.length ? col.map(ideaCard).join("") : '<div class="empty">비어 있습니다.</div>') + "</section>";
-    }).join("") + "</div>";
-    return h;
+  function dmRender() {
+    var st = $("#dmStage"), doc = dmDoc(); if (!st || !doc) return;
+    st.innerHTML = '<svg class="dm-edges" aria-hidden="true"></svg><div class="dm-lbls"></div>' + (doc.nodes.length ? "" : '<div class="dm-hint">위의 상자 버튼으로 시작하세요.<br>상자를 누르면 둥근 점이 나타납니다. 점을 끌어 다른 상자에 놓으면 화살표가 이어집니다.</div>') + doc.nodes.map(function (n) { return dmNodeHtml(n, DM.sel && DM.sel.t === "n" && DM.sel.id === n.id); }).join("");
+    dmEdges(); dmTools();
   }
-  function ideaGrow() { [].forEach.call(document.querySelectorAll("textarea.idea-b"), function (t) { t.style.height = "auto"; t.style.height = Math.max(40, t.scrollHeight + 2) + "px"; }); }
+  function dmRects() { var R = {}; [].forEach.call(document.querySelectorAll("#dmStage .dn"), function (el) { R[el.dataset.nid] = { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }; }); return R; }
+  function dmAnchor(r, s) { return s === "r" ? [r.x + r.w, r.y + r.h / 2] : s === "l" ? [r.x, r.y + r.h / 2] : s === "b" ? [r.x + r.w / 2, r.y + r.h] : [r.x + r.w / 2, r.y]; }
+  var DM_N = { r: [1, 0], l: [-1, 0], b: [0, 1], t: [0, -1] }, dmOpp = { r: "l", l: "r", b: "t", t: "b" };
+  function dmRoute(A, B, style) {
+    var ax = A.x + A.w / 2, ay = A.y + A.h / 2, bx = B.x + B.w / 2, by = B.y + B.h / 2, dx = bx - ax, dy = by - ay;
+    var hr = Math.abs(dx) / ((A.w + B.w) / 2 + 1), vr = Math.abs(dy) / ((A.h + B.h) / 2 + 1), sa, sb;
+    if (hr >= vr) { sa = dx >= 0 ? "r" : "l"; } else { sa = dy >= 0 ? "b" : "t"; } sb = dmOpp[sa];
+    var p1 = dmAnchor(A, sa), p2 = dmAnchor(B, sb), r = function (v) { return Math.round(v * 10) / 10; }, d, mid;
+    if (style === "line") { d = "M" + r(p1[0]) + " " + r(p1[1]) + "L" + r(p2[0]) + " " + r(p2[1]); mid = [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2]; }
+    else if (style === "elbow") {
+      var pts; if (sa === "r" || sa === "l") { var xm = (p1[0] + p2[0]) / 2; pts = [p1, [xm, p1[1]], [xm, p2[1]], p2]; mid = [xm, (p1[1] + p2[1]) / 2]; } else { var ym = (p1[1] + p2[1]) / 2; pts = [p1, [p1[0], ym], [p2[0], ym], p2]; mid = [(p1[0] + p2[0]) / 2, ym]; }
+      d = "M" + r(pts[0][0]) + " " + r(pts[0][1]); for (var i = 1; i < pts.length - 1; i++) { var a = pts[i - 1], b = pts[i], c = pts[i + 1], k = 12, l1 = Math.hypot(b[0] - a[0], b[1] - a[1]), l2 = Math.hypot(c[0] - b[0], c[1] - b[1]), q1 = Math.min(k, l1 / 2), q2 = Math.min(k, l2 / 2); if (!l1 || !l2) continue; d += "L" + r(b[0] + (a[0] - b[0]) / l1 * q1) + " " + r(b[1] + (a[1] - b[1]) / l1 * q1) + "Q" + r(b[0]) + " " + r(b[1]) + " " + r(b[0] + (c[0] - b[0]) / l2 * q2) + " " + r(b[1] + (c[1] - b[1]) / l2 * q2); }
+      d += "L" + r(p2[0]) + " " + r(p2[1]);
+    } else {
+      var kk = Math.max(40, Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / 2.5), n1 = DM_N[sa], n2 = DM_N[sb], c1 = [p1[0] + n1[0] * kk, p1[1] + n1[1] * kk], c2 = [p2[0] + n2[0] * kk, p2[1] + n2[1] * kk];
+      d = "M" + r(p1[0]) + " " + r(p1[1]) + "C" + r(c1[0]) + " " + r(c1[1]) + " " + r(c2[0]) + " " + r(c2[1]) + " " + r(p2[0]) + " " + r(p2[1]);
+      mid = [(p1[0] + 3 * c1[0] + 3 * c2[0] + p2[0]) / 8, (p1[1] + 3 * c1[1] + 3 * c2[1] + p2[1]) / 8];
+    }
+    return { d: d, mid: mid };
+  }
+  function dmEdges() {
+    var st = $("#dmStage"), doc = dmDoc(); if (!st || !doc) return; var svg = st.querySelector(".dm-edges"), lb = st.querySelector(".dm-lbls"); if (!svg) return;
+    var R = dmRects(), maxX = 2400, maxY = 1600; Object.keys(R).forEach(function (k) { maxX = Math.max(maxX, R[k].x + R[k].w + 500); maxY = Math.max(maxY, R[k].y + R[k].h + 400); });
+    st.style.width = maxX + "px"; st.style.height = maxY + "px"; var pad = $("#dmPad"); if (pad) { pad.style.width = maxX * DM.zoom + "px"; pad.style.height = maxY * DM.zoom + "px"; }
+    svg.setAttribute("width", maxX); svg.setAttribute("height", maxY);
+    var h = '<defs><marker id="dmAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 1L10 5L0 9z" class="dm-ar"></path></marker><marker id="dmArS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 1L10 5L0 9z" class="dm-ar s"></path></marker></defs>', L = "";
+    doc.edges.forEach(function (e) {
+      var A = R[e.a], B = R[e.b]; if (!A || !B || e.a === e.b) return; var rt = dmRoute(A, B, e.style || "curve"), sel = DM.sel && DM.sel.t === "e" && DM.sel.id === e.id, mk = sel ? "dmArS" : "dmAr", hd = e.head || "end";
+      h += '<path class="dm-e' + (sel ? " sel" : "") + (e.dash ? " dash" : "") + '" d="' + rt.d + '"' + (hd === "end" || hd === "both" ? ' marker-end="url(#' + mk + ')"' : "") + (hd === "both" ? ' marker-start="url(#' + mk + ')"' : "") + '></path><path class="dm-hit" d="' + rt.d + '" data-eid="' + e.id + '"></path>';
+      if (e.label) L += '<div class="dm-lbl' + (sel ? " sel" : "") + '" data-eid="' + e.id + '" style="left:' + Math.round(rt.mid[0]) + "px;top:" + Math.round(rt.mid[1]) + 'px">' + esc(e.label) + "</div>";
+    });
+    svg.innerHTML = h; lb.innerHTML = L;
+  }
+  function dmTools() {
+    var el = $("#dmTools"), doc = dmDoc(); if (!el || !doc) return; var s = DM.sel, n = s && s.t === "n" ? doc.nodes.filter(function (x) { return x.id === s.id; })[0] : null, e = s && s.t === "e" ? doc.edges.filter(function (x) { return x.id === s.id; })[0] : null;
+    var sel = function (id, cur, opts) { return '<select class="in" data-dmf="' + id + '" aria-label="' + id + '">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (cur === o[0] ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select>"; };
+    var h = '<div class="dm-row"><span class="sm muted">상자 추가</span>' + DM_SH.map(function (x) { return '<button class="btn sm" data-act="dm-add" data-sh="' + x[0] + '">' + x[1] + "</button>"; }).join("") + "</div>";
+    if (n) h += '<div class="dm-row"><span class="sm muted">선택한 상자</span>' + DM_COL.map(function (c) { return '<button class="dm-sw' + (n.color === c[0] ? " on" : "") + '" style="background:' + c[2] + '" data-act="dm-color" data-c="' + c[0] + '" aria-label="' + c[1] + '" title="' + c[1] + '"></button>'; }).join("") + sel("nshape", n.shape || "round", DM_SH) + '<button class="btn sm" data-act="dm-edit">글 고치기</button><button class="btn sm" data-act="dm-dup">복제</button><button class="btn sm dng" data-act="dm-del">삭제</button></div>';
+    else if (e) h += '<div class="dm-row"><span class="sm muted">선택한 화살표</span>' + sel("estyle", e.style || "curve", DM_ST) + sel("ehead", e.head || "end", DM_HD) + '<label class="sm dm-ck"><input type="checkbox" data-dmf="edash"' + (e.dash ? " checked" : "") + '> 점선</label><input class="in dm-lin" type="text" data-dmf="elabel" value="' + esc(e.label || "") + '" placeholder="이름 (예: 선행, 대안)" aria-label="화살표 이름"><button class="btn sm" data-act="dm-flip">방향 바꾸기</button><button class="btn sm dng" data-act="dm-del">삭제</button></div>';
+    else h += '<div class="dm-row"><span class="sm muted">새 화살표</span>' + sel("dstyle", DM.defStyle, DM_ST) + sel("dhead", DM.defHead, DM_HD) + '<span class="sm muted">상자를 눌러 선택 → 둥근 점을 끌어 다른 상자에 놓기 · 빈 곳에 놓으면 새 상자</span></div>';
+    h += '<div class="dm-row"><button class="btn sm" data-act="dm-undo"' + (DM.undo.length ? "" : " disabled") + '>↶ 되돌리기</button><button class="btn sm" data-act="dm-zoom" data-v="-1">－</button><span class="sm">' + Math.round(DM.zoom * 100) + '%</span><button class="btn sm" data-act="dm-zoom" data-v="1">＋</button><button class="btn sm" data-act="dm-zoom" data-v="0">100%</button><button class="btn sm" data-act="dm-fit">전체 보기</button></div>';
+    el.innerHTML = h;
+  }
+  function dmField(el, live) {
+    var f = el.dataset.dmf, doc = dmDoc(); if (f === "dstyle") { DM.defStyle = el.value; return; } if (f === "dhead") { DM.defHead = el.value; return; } if (!doc || !DM.sel) return;
+    var n = DM.sel.t === "n" ? doc.nodes.filter(function (q) { return q.id === DM.sel.id; })[0] : null, e = DM.sel.t === "e" ? doc.edges.filter(function (q) { return q.id === DM.sel.id; })[0] : null;
+    if (f === "elabel" && e) { e.label = el.value; if (live) { dmEdges(); return; } dmSnap(doc); dmSave(doc); dmRender(); return; }
+    if (!live) { dmSnap(doc); if (f === "nshape" && n) n.shape = el.value; else if (f === "estyle" && e) e.style = el.value; else if (f === "ehead" && e) e.head = el.value; else if (f === "edash" && e) e.dash = el.checked; dmSave(doc); dmRender(); }
+  }
+  function vPDgm() {
+    var list = pAll("diagram").sort(function (a, b) { return (a.created || "") < (b.created || "") ? -1 : 1; }), doc = dmDoc();
+    if (!doc && list.length) { DM.id = list[0].id; doc = list[0]; DM.sel = null; DM.undo = []; }
+    var h = head("", "다이어그램 보드", "나만 보이는 보드입니다.<br>상자를 놓고 화살표로 이어서 구조 · 흐름 · 아이디어를 그립니다. 글이 길어지면 상자가 커집니다.", "");
+    h += '<div class="card"><div class="chips">' + list.map(function (x) { return '<button class="chip" data-act="dm-open" data-id="' + x.id + '" aria-pressed="' + (doc && doc.id === x.id) + '">' + esc(x.title || "(제목 없음)") + "</button>"; }).join("") + '</div><div class="acts" style="margin-top:10px">' + (canW || uid ? '<button class="btn pri" data-act="dm-new">+ 새 다이어그램</button><button class="btn" data-act="dm-sample">예시로 시작</button>' : "") + "</div>";
+    if (doc) h += '<div class="addrow" style="margin-top:10px"><input class="in" type="text" data-col="personal" data-id="' + doc.id + '" data-f="title" value="' + esc(doc.title || "") + '" placeholder="다이어그램 이름" aria-label="이름">' + delBtn("personal", doc.id) + "</div>";
+    h += "</div>";
+    if (!doc) return h + '<div class="card"><div class="empty">아직 다이어그램이 없습니다. 새 다이어그램을 만들거나 예시로 시작해 보세요.</div></div>';
+    return h + '<div class="card dm-card"><div class="dm-tools" id="dmTools"></div><div class="dm-view" id="dmView"><div class="dm-pad" id="dmPad"><div class="dm-stage" id="dmStage" style="transform:scale(' + DM.zoom + ')"></div></div></div></div>';
+  }
+  function dmMount() {
+    var st = $("#dmStage"); if (!st || st.dataset.ready) return; st.dataset.ready = "1"; dmRender();
+    var doc = dmDoc(), v = $("#dmView"); if (doc && v && doc.nodes.length) { var mx = 1e9, my = 1e9; doc.nodes.forEach(function (n) { mx = Math.min(mx, n.x); my = Math.min(my, n.y); }); v.scrollLeft = Math.max(0, (mx - 60) * DM.zoom); v.scrollTop = Math.max(0, (my - 60) * DM.zoom); }
+  }
+  function dmViewCenter() { var v = $("#dmView"); return v ? [(v.scrollLeft + v.clientWidth / 2) / DM.zoom, (v.scrollTop + v.clientHeight / 2) / DM.zoom] : [300, 200]; }
+  function dmAddNode(sh, x, y, color, text) {
+    var doc = dmDoc(); if (!doc) return null; dmSnap(doc); var c = dmViewCenter(), n = { id: dmUid(), x: Math.round((x == null ? c[0] - 70 + (Math.random() * 40 - 20) : x) / 10) * 10, y: Math.round((y == null ? c[1] - 30 + (Math.random() * 40 - 20) : y) / 10) * 10, text: text == null ? "새 상자" : text, shape: sh || "round", color: color || DM_COL[doc.nodes.length % DM_COL.length][0] };
+    doc.nodes = doc.nodes.concat([n]); dmSave(doc); return n;
+  }
+  function dmEdit(id) {
+    var el = document.querySelector('#dmStage .dn[data-nid="' + id + '"]'); if (!el) return; var t = el.querySelector(".dn-t"); el.classList.add("edit"); t.setAttribute("contenteditable", "true"); DM.editing = id; t.focus();
+    try { var r = document.createRange(); r.selectNodeContents(t); var s = getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {}
+  }
+  function dmEndEdit(el) {
+    var doc = dmDoc(); if (!el || !doc || DM.editing == null) return; var id = DM.editing; DM.editing = null; var t = el.querySelector(".dn-t"), txt = (t.innerText || "").replace(/\s+$/g, ""); t.removeAttribute("contenteditable"); el.classList.remove("edit");
+    var n = doc.nodes.filter(function (x) { return x.id === id; })[0]; if (n && n.text !== txt) { dmSnap(doc); n.text = txt; dmSave(doc); } dmEdges(); dmTools();
+  }
+  function dmSelect(s) { DM.sel = s; [].forEach.call(document.querySelectorAll("#dmStage .dn"), function (el) { el.classList.toggle("sel", !!s && s.t === "n" && s.id === el.dataset.nid); }); dmEdges(); dmTools(); }
+  function dmDelete() {
+    var doc = dmDoc(), s = DM.sel; if (!doc || !s) return; dmSnap(doc);
+    if (s.t === "n") { doc.nodes = doc.nodes.filter(function (n) { return n.id !== s.id; }); doc.edges = doc.edges.filter(function (e) { return e.a !== s.id && e.b !== s.id; }); } else doc.edges = doc.edges.filter(function (e) { return e.id !== s.id; });
+    DM.sel = null; dmSave(doc); dmRender();
+  }
+  function dmUndo() { var j = DM.undo.pop(); if (!j) return; var o = JSON.parse(j), doc = dmDoc(); if (!doc || o.id !== doc.id) { dmTools(); return; } doc.nodes = o.nodes; doc.edges = o.edges; DM.sel = null; dmSave(doc); dmRender(); }
+  function dmSetZoom(z) { DM.zoom = Math.max(0.3, Math.min(2, Math.round(z * 100) / 100)); var st = $("#dmStage"); if (st) st.style.transform = "scale(" + DM.zoom + ")"; dmEdges(); dmTools(); }
+  function dmSampleData() {
+    var N = function (id, x, y, t, sh, c) { return { id: id, x: x, y: y, text: t, shape: sh, color: c }; }, E = function (id, a, b, st, hd, lb) { return { id: id, a: a, b: b, style: st, head: hd, label: lb || "", dash: false }; };
+    return { nodes: [N("n1", 80, 60, "요구사양\n(차량 업체)", "cloud", "yellow"), N("n2", 380, 150, "설계 검토\n프레임 · 모듈 구성", "round", "purple"), N("n3", 700, 40, "도면 출도", "round", "pink"), N("n4", 740, 190, "발주 · 제작", "round", "green"), N("n5", 740, 330, "조립 · 설치", "round", "green"), N("n6", 80, 270, "전기팀 협의", "round", "green"), N("n7", 390, 340, "자료실", "round", "pink"), N("n8", 380, 500, "프로젝트 DB", "db", "gray")],
+      edges: [E("e1", "n1", "n2", "elbow", "end"), E("e2", "n2", "n3", "elbow", "end"), E("e3", "n2", "n4", "curve", "end"), E("e4", "n4", "n5", "curve", "end"), E("e5", "n6", "n2", "elbow", "both", "인터페이스"), E("e6", "n7", "n2", "curve", "end", "참고"), E("e7", "n7", "n8", "curve", "both")] };
+  }
+  /* 끌기 · 선택 · 연결 */
+  (function () {
+    var g = null;
+    function stagePt(e) { var r = $("#dmStage").getBoundingClientRect(); return [(e.clientX - r.left) / DM.zoom, (e.clientY - r.top) / DM.zoom]; }
+    document.addEventListener("pointerdown", function (e) {
+      var t = e.target; if (!t || !t.closest || !$("#dmStage")) return; var st = $("#dmStage"); if (!st.contains(t) && !t.closest("#dmView")) return; if (e.button > 0) return; var doc = dmDoc(); if (!doc) return;
+      var h = t.closest(".dn-h"), nd = t.closest(".dn"), eh = t.closest(".dm-hit, .dm-lbl");
+      if (DM.editing != null && !(nd && nd.classList.contains("edit"))) { var ed = document.querySelector("#dmStage .dn.edit"); if (ed) dmEndEdit(ed); }
+      if (h) { e.preventDefault(); g = { k: "link", from: h.dataset.nid, sx: e.clientX, sy: e.clientY, on: false, pid: e.pointerId }; try { h.setPointerCapture(e.pointerId); } catch (x) {} return; }
+      if (nd) { if (nd.classList.contains("edit")) return; e.preventDefault(); var n = doc.nodes.filter(function (q) { return q.id === nd.dataset.nid; })[0]; if (!n) return; var was = !!(DM.sel && DM.sel.t === "n" && DM.sel.id === n.id); if (!was) dmSelect({ t: "n", id: n.id }); g = { k: "move", was: was, id: n.id, el: nd, ox: n.x, oy: n.y, sx: e.clientX, sy: e.clientY, on: false, pid: e.pointerId }; try { nd.setPointerCapture(e.pointerId); } catch (x) {} return; }
+      if (eh) { dmSelect({ t: "e", id: eh.dataset.eid }); return; }
+      if (t.closest("#dmView")) { if (DM.sel) dmSelect(null); if (e.pointerType === "mouse") { var v = $("#dmView"); g = { k: "pan", sx: e.clientX, sy: e.clientY, sl: v.scrollLeft, stt: v.scrollTop, pid: e.pointerId, on: true }; } }
+    });
+    document.addEventListener("pointermove", function (e) {
+      if (!g || e.pointerId !== g.pid) return; var dx = e.clientX - g.sx, dy = e.clientY - g.sy;
+      if (g.k === "pan") { var v = $("#dmView"); v.scrollLeft = g.sl - dx; v.scrollTop = g.stt - dy; return; }
+      if (!g.on) { if (Math.abs(dx) + Math.abs(dy) < 5) return; g.on = true; }
+      if (g.k === "move") { var nx = g.ox + dx / DM.zoom, ny = g.oy + dy / DM.zoom; g.el.style.left = Math.round(nx) + "px"; g.el.style.top = Math.round(ny) + "px"; g.nx = nx; g.ny = ny; var n = dmDoc().nodes.filter(function (q) { return q.id === g.id; })[0]; n.x = nx; n.y = ny; dmEdges(); }
+      else if (g.k === "link") {
+        var R = dmRects(), A = R[g.from], p = stagePt(e), svg = $("#dmStage .dm-edges"); if (!A || !svg) return; var tmp = svg.querySelector(".dm-tmp"); if (!tmp) { tmp = document.createElementNS("http://www.w3.org/2000/svg", "path"); tmp.setAttribute("class", "dm-e dm-tmp"); svg.appendChild(tmp); }
+        var a = dmAnchor(A, Math.abs(p[0] - (A.x + A.w / 2)) / A.w > Math.abs(p[1] - (A.y + A.h / 2)) / A.h ? (p[0] > A.x + A.w / 2 ? "r" : "l") : (p[1] > A.y + A.h / 2 ? "b" : "t")); tmp.setAttribute("d", "M" + a[0] + " " + a[1] + "L" + p[0] + " " + p[1]);
+        [].forEach.call(document.querySelectorAll("#dmStage .dn.target"), function (q) { q.classList.remove("target"); }); var el = document.elementFromPoint(e.clientX, e.clientY), tn = el && el.closest ? el.closest(".dn") : null; if (tn && tn.dataset.nid !== g.from) tn.classList.add("target");
+      }
+    });
+    function end(e, ok) {
+      if (!g || (e && e.pointerId !== g.pid)) return; var d = g; g = null; var doc = dmDoc(); [].forEach.call(document.querySelectorAll("#dmStage .dn.target"), function (q) { q.classList.remove("target"); });
+      if (d.k === "pan") return;
+      if (d.k === "move") { if (d.on && ok && doc) { var n = doc.nodes.filter(function (q) { return q.id === d.id; })[0]; if (n) { var fx = Math.round(d.nx / 10) * 10, fy = Math.round(d.ny / 10) * 10; n.x = d.ox; n.y = d.oy; dmSnap(doc); n.x = fx; n.y = fy; dmSave(doc); } } else if (doc) { var n2 = doc.nodes.filter(function (q) { return q.id === d.id; })[0]; if (n2) { n2.x = d.ox; n2.y = d.oy; } } dmRender(); if (!d.on && ok && d.was) dmEdit(d.id); return; }
+      if (d.k === "link") {
+        var tmp = $("#dmStage .dm-tmp"); if (tmp) tmp.remove(); if (!d.on || !ok || !doc) return;
+        var el = document.elementFromPoint(e.clientX, e.clientY), tn = el && el.closest ? el.closest(".dn") : null, to;
+        if (tn && tn.dataset.nid !== d.from) to = tn.dataset.nid; else if (!tn) { var p = stagePt(e), src = doc.nodes.filter(function (q) { return q.id === d.from; })[0], nn = dmAddNode("round", p[0] - 70, p[1] - 28, src ? src.color : null, "새 상자"); if (nn) to = nn.id; }
+        if (to) { if (!doc.edges.some(function (q) { return q.a === d.from && q.b === to; })) { if (!(DM.undo.length && false)) dmSnap(doc); doc.edges = doc.edges.concat([{ id: dmUid(), a: d.from, b: to, style: DM.defStyle, head: DM.defHead, label: "", dash: false }]); dmSave(doc); } DM.sel = { t: "n", id: to }; dmRender(); if (!tn) dmEdit(to); }
+      }
+    }
+    document.addEventListener("pointerup", function (e) { end(e, true); });
+    document.addEventListener("pointercancel", function (e) { end(e, false); });
+    document.addEventListener("dblclick", function (e) { var nd = e.target && e.target.closest ? e.target.closest("#dmStage .dn") : null; if (nd && !nd.classList.contains("edit")) dmEdit(nd.dataset.nid); });
+    document.addEventListener("focusout", function (e) { var nd = e.target && e.target.closest ? e.target.closest("#dmStage .dn.edit") : null; if (nd) dmEndEdit(nd); });
+    document.addEventListener("input", function (e) { if (e.target && e.target.classList && e.target.classList.contains("dn-t")) dmEdges(); });
+    document.addEventListener("paste", function (e) { var t = e.target; if (t && t.classList && t.classList.contains("dn-t")) { e.preventDefault(); var tx = (e.clipboardData || window.clipboardData).getData("text/plain"); document.execCommand("insertText", false, tx); } });
+    document.addEventListener("keydown", function (e) {
+      if (!$("#dmStage")) return; var ed = document.querySelector("#dmStage .dn.edit");
+      if (ed) { if (e.key === "Escape") { e.preventDefault(); dmEndEdit(ed); } return; }
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+      if ((e.key === "Delete" || e.key === "Backspace") && DM.sel) { e.preventDefault(); dmDelete(); }
+      else if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) { e.preventDefault(); dmUndo(); }
+      else if (e.key === "Enter" && DM.sel && DM.sel.t === "n") { e.preventDefault(); dmEdit(DM.sel.id); }
+      else if (e.key === "Escape" && DM.sel) dmSelect(null);
+    });
+  })();
   function vPersonal() {
     if (!uid) return head("", "개인", "") + '<div class="banner">개인 메뉴는 로그인한 본인에게만 보입니다.<br>지금은 개인 저장공간에 연결되지 않았습니다. 로그인한 상태로 열어 주세요.</div>';
     var c = ui.pcat || "home";
     if (c === "home") return vPHome();
     if (c === "todo") return vPTodo();
-    if (c === "idea") return vPIdeas();
+    if (c === "dgm") return vPDgm();
     return vPNotes(c);
   }
   function vPHome() {
@@ -3252,7 +3378,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       '<div class="card"><h2>앞으로 2주</h2>' + (up.length ? '<ul class="list">' + up.map(function (x) { return x.kind === "todo" ? pTodoRow(x) : '<li class="row"><span class="tag k-pnote">개인 일정</span><button class="go t" data-act="pnote-open" data-id="' + x.id + '">' + esc(x.title) + '</button><span class="dd">' + fmt(x.date) + "</span></li>"; }).join("") + "</ul>" : '<div class="empty">앞으로 2주 안에 잡힌 일정이 없습니다.<br>메모에 날짜를 넣으면 여기와 달력에 표시됩니다.</div>') + "</div></div>";
     h += '<div class="subt" style="margin:6px 2px 0"><span style="font-size:16px;font-weight:800">분류</span></div><div class="ptiles">' + PCATS.filter(function (x) { return x[0] !== "home" && x[0] !== "todo"; }).map(function (x) {
       var n = notes.filter(function (y) { return y.cat === x[0]; }).length, m = todos.filter(function (y) { return y.cat === x[0] && !y.done; }).length;
-      return '<button class="card ptile" data-act="pcat" data-v="' + x[0] + '"><b>' + x[1] + '</b><span class="sm muted">' + PHINT[x[0]] + '</span><span class="cnt">' + (x[0] === "idea" ? "아이디어 " + pAll("idea").length + " · 채택 " + pAll("idea").filter(function (y) { return y.status === "adopt"; }).length : "메모 " + n + " · 할 일 " + m) + "</span></button>";
+      return '<button class="card ptile" data-act="pcat" data-v="' + x[0] + '"><b>' + x[1] + '</b><span class="sm muted">' + PHINT[x[0]] + '</span><span class="cnt">' + (x[0] === "dgm" ? "다이어그램 " + pAll("diagram").length + "개" : "메모 " + n + " · 할 일 " + m) + "</span></button>";
     }).join("") + "</div>";
     return h;
   }
@@ -3419,12 +3545,18 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       case "p-showdone": ui.pShowDone = !ui.pShowDone; sr(); break;
       case "pnote-add": { var pn = { kind: "note", cat: d.cat, title: "새 메모", body: "", date: "", updated: TODAY() }, pid2 = create("personal", pn); if (pid2) { if (!byId("personal", pid2)) D.personal.push(Object.assign({ id: pid2 }, pn)); ui.pNote = pid2; ui.pEdit = true; sr(); } break; }
       case "pnote-open": { var po = byId("personal", id); if (po) { ui.view = "personal"; ui.pcat = po.cat; ui.pNote = id; ui.pEdit = false; sr(); } break; }
-      case "idea-add": { var it0 = $("#ideaNew"), ti = it0 ? it0.value.trim() : ""; if (!ti) { toast("제목을 적어 주세요"); break; } var idn = { kind: "idea", cat: "idea", title: ti, body: "", status: "new", prio: "mid", proj: (IDEA_F.proj && IDEA_F.proj !== "_") ? IDEA_F.proj : "", tag: IDEA_F.tag || "", links: [], ord: pAll("idea").reduce(function (m, y) { return Math.max(m, ordOf(y)); }, 0) + 1, updated: TODAY() }, iid = create("personal", idn); if (iid) { if (!byId("personal", iid)) D.personal.push(Object.assign({ id: iid }, idn)); sr(); } break; }
-      case "idea-mv": { var ix = byId("personal", id), ik = IDEA_ST.map(function (q) { return q[0]; }), ni = ik.indexOf(ix && ix.status || "new") + (+d.d); if (ix && ni >= 0 && ni < ik.length) { ix.status = ik[ni]; patch("personal", id, { status: ik[ni] }); sr(); } break; }
-      case "idea-link": IDEA_LINK = IDEA_LINK === id ? null : id; sr(); break;
-      case "idea-pick": { var src = byId("personal", IDEA_LINK); if (!src || id === IDEA_LINK) { IDEA_LINK = null; sr(); break; } var ls = (src.links || []).slice(), li = ls.indexOf(id); if (li >= 0) { ls.splice(li, 1); toast("연결을 지웠습니다"); } else { ls.push(id); toast("연결했습니다"); } src.links = ls; patch("personal", src.id, { links: ls }); IDEA_LINK = null; sr(); break; }
-      case "idea-unlink": { var us = byId("personal", id); if (us) { var ul = (us.links || []).filter(function (q) { return q !== d.to; }); us.links = ul; patch("personal", id, { links: ul }); sr(); } break; }
-      case "idea-pr": IDEA_F.prio = d.v; sr(); break;
+      case "dm-new": { var nd0 = { kind: "diagram", cat: "dgm", title: "새 다이어그램", nodes: [], edges: [], created: TODAY() + " " + Date.now(), updated: TODAY() }, ni0 = create("personal", nd0); if (ni0) { if (!byId("personal", ni0)) D.personal.push(Object.assign({ id: ni0 }, nd0)); DM.id = ni0; DM.sel = null; DM.undo = []; sr(); } break; }
+      case "dm-sample": { var sm = dmSampleData(), nd1 = { kind: "diagram", cat: "dgm", title: "예시 · 설계 흐름", nodes: sm.nodes, edges: sm.edges, created: TODAY() + " " + Date.now(), updated: TODAY() }, ni1 = create("personal", nd1); if (ni1) { if (!byId("personal", ni1)) D.personal.push(Object.assign({ id: ni1 }, nd1)); DM.id = ni1; DM.sel = null; DM.undo = []; sr(); } break; }
+      case "dm-open": DM.id = id; DM.sel = null; DM.undo = []; sr(); break;
+      case "dm-add": { var an = dmAddNode(d.sh); if (an) { DM.sel = { t: "n", id: an.id }; dmRender(); dmEdit(an.id); } break; }
+      case "dm-color": { var cd = dmDoc(), cn = cd && DM.sel && cd.nodes.filter(function (q) { return q.id === DM.sel.id; })[0]; if (cn) { dmSnap(cd); cn.color = d.c; dmSave(cd); dmRender(); } break; }
+      case "dm-edit": if (DM.sel && DM.sel.t === "n") dmEdit(DM.sel.id); break;
+      case "dm-dup": { var dd = dmDoc(), dn = dd && DM.sel && dd.nodes.filter(function (q) { return q.id === DM.sel.id; })[0]; if (dn) { dmSnap(dd); var cp = Object.assign({}, dn, { id: dmUid(), x: dn.x + 30, y: dn.y + 30 }); dd.nodes = dd.nodes.concat([cp]); dmSave(dd); DM.sel = { t: "n", id: cp.id }; dmRender(); } break; }
+      case "dm-del": dmDelete(); break;
+      case "dm-flip": { var fd = dmDoc(), fe = fd && DM.sel && fd.edges.filter(function (q) { return q.id === DM.sel.id; })[0]; if (fe) { dmSnap(fd); var tt = fe.a; fe.a = fe.b; fe.b = tt; dmSave(fd); dmRender(); } break; }
+      case "dm-undo": dmUndo(); break;
+      case "dm-zoom": dmSetZoom(d.v === "0" ? 1 : DM.zoom + (+d.v) * 0.15); break;
+      case "dm-fit": { var fv = $("#dmView"), fdc = dmDoc(); if (fv && fdc && fdc.nodes.length) { var R = dmRects(), x0 = 1e9, y0 = 1e9, x1 = 0, y1 = 0; Object.keys(R).forEach(function (k) { x0 = Math.min(x0, R[k].x); y0 = Math.min(y0, R[k].y); x1 = Math.max(x1, R[k].x + R[k].w); y1 = Math.max(y1, R[k].y + R[k].h); }); dmSetZoom(Math.min(1.2, fv.clientWidth / (x1 - x0 + 120), fv.clientHeight / (y1 - y0 + 120))); fv.scrollLeft = Math.max(0, (x0 - 60) * DM.zoom); fv.scrollTop = Math.max(0, (y0 - 60) * DM.zoom); } break; }
       case "pnote-edit": ui.pEdit = !ui.pEdit; sr(); break;
       case "dict": toggleDict(); break;
       case "ai": runAI(id || (ui.detail && ui.detail.id)); break;
@@ -3439,7 +3571,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   document.addEventListener("change", function (e) {
     var el = e.target, d = el.dataset;
     if (d.scale) { ui.scale = +el.value || 10; sr(); return; }
-    if (d.ideaf) { IDEA_F[d.ideaf] = el.value; sr(); return; }
+    if (d.dmf) { dmField(el, false); return; }
     if (d.modsort) { modState().sort = el.value; modStateSave(); sr(); return; }
     if (d.orgrename !== undefined) { if (!canW) return; D.contacts.forEach(function (c) { if (pidOf(c) === ui.pid && (c.org || "(조직 미지정)") === d.orgrename) { c.org = el.value; patch("contacts", c.id, { org: el.value }); } }); ui.orgOpen[el.value] = true; sr(); return; }
     if (d.orgtype !== undefined) { if (!canW) return; D.contacts.forEach(function (c) { if (pidOf(c) === ui.pid && (c.org || "(조직 미지정)") === d.orgtype) { c.orgType = el.value; patch("contacts", c.id, { orgType: el.value }); } }); sr(); return; }
@@ -3457,13 +3589,13 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   });
   document.addEventListener("input", function (e) {
     var el = e.target;
-    if (el.classList && el.classList.contains("idea-b")) { el.style.height = "auto"; el.style.height = Math.max(40, el.scrollHeight + 2) + "px"; ideaArrows(); }
+    if (el.dataset && el.dataset.dmf === "elabel") { dmField(el, true); return; }
     if (el.dataset.lr !== undefined) { var lk = el.dataset.lr, lrow = (LST[lk] || [])[+el.dataset.li]; if (lrow) { var lf = el.dataset.lf; lrow[lf] = lf === "n" || lf === "v" ? el.value : (el.value === "" ? "" : parseFloat(el.value)); lstSave(lk); if (lk === "el") runElec(); else runBz(); } return; }
     if (el.dataset.bxr !== undefined) { var br = bxLoad()[+el.dataset.bxr]; if (br) { var bf = el.dataset.bxf; br[bf] = bf === "n" ? el.value : (el.value === "" ? "" : parseFloat(el.value)); bxSave(); runBox(); } return; }
     if (el.dataset.calc) { ui.calcv = ui.calcv || {}; ui.calcv[el.id] = el.value; if (el.id === "mot-mech") { sr(); return; } if (el.dataset.rr) { sr(); return; } if (el.id === "gd-proc") { ui.calcv["gd-part"] = "0"; sr(); return; } runCalc(); }
     if (el.id === "refQ") { ui.q = el.value; var q = ui.q.trim().toLowerCase(), cat = ui.filt.ref || "전체", list = sorted("refs", function (a, b) { return (a.title || "") < (b.title || "") ? -1 : 1; }).filter(function (r) { return (cat === "전체" || r.cat === cat) && (!q || ((r.title || "") + (r.body || "")).toLowerCase().indexOf(q) >= 0); }); $("#refList").innerHTML = refList(list, byId("refs", ui.refId)); }
   });
-  document.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.id === "ideaNew") { var ib = document.querySelector("[data-act=idea-add]"); if (ib) ib.click(); return; } if (e.key === "Enter" && e.target.id === "newTodo") { var b = e.target.parentNode.querySelector("[data-act=todo-add]"); if (b) b.click(); } });
+  document.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.id === "newTodo") { var b = e.target.parentNode.querySelector("[data-act=todo-add]"); if (b) b.click(); } });
 
   $("#cmd").addEventListener("input", applyFilter);
   document.addEventListener("keydown", function (e) {
@@ -3647,7 +3779,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     });
   }
   (function () {
-    var q = false; function go() { if (q) return; q = true; requestAnimationFrame(function () { q = false; try { passify(); ideaGrow(); ideaArrows(); } catch (e) {} }); }
+    var q = false; function go() { if (q) return; q = true; requestAnimationFrame(function () { q = false; try { passify(); dmMount(); } catch (e) {} }); }
     try { new MutationObserver(go).observe(document.body, { childList: true, subtree: true }); } catch (e) {}
     go();
     document.addEventListener("keydown", function (e) {
@@ -3665,64 +3797,6 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       setTimeout(function () { if (lastAct >= t0 - 5 || !el.isConnected) return; el.dispatchEvent(new CustomEvent("twtap", { bubbles: true, cancelable: true })); }, 90);
     }, true);
   })();
-  /* 카드 연결 화살표: 카드 위치를 재서 보드 위의 SVG 에 곡선을 그린다 */
-  function ideaArrows() {
-    var b = document.querySelector(".idb"); if (!b) return; var svg = b.querySelector(".idb-svg"); if (!svg) return;
-    var br = b.getBoundingClientRect(), sl = b.scrollLeft, sT = b.scrollTop, R = {};
-    [].forEach.call(b.querySelectorAll(".idea[data-id]"), function (el) { var r = el.getBoundingClientRect(); R[el.dataset.id] = { l: r.left - br.left + sl, r: r.right - br.left + sl, t: r.top - br.top + sT, b: r.bottom - br.top + sT }; });
-    var d = "", n = function (v) { return Math.round(v * 10) / 10; };
-    pAll("idea").forEach(function (x) {
-      (x.links || []).forEach(function (to) {
-        var A = R[x.id], B = R[to]; if (!A || !B || x.id === to) return; var p;
-        if (B.l >= A.r - 6) { var x1 = A.r, y1 = (A.t + A.b) / 2, x2 = B.l, y2 = (B.t + B.b) / 2, k = Math.max(30, (x2 - x1) / 2); p = "M" + n(x1) + " " + n(y1) + "C" + n(x1 + k) + " " + n(y1) + " " + n(x2 - k) + " " + n(y2) + " " + n(x2) + " " + n(y2); }
-        else if (B.r <= A.l + 6) { var x3 = A.l, y3 = (A.t + A.b) / 2, x4 = B.r, y4 = (B.t + B.b) / 2, k2 = Math.max(30, (x3 - x4) / 2); p = "M" + n(x3) + " " + n(y3) + "C" + n(x3 - k2) + " " + n(y3) + " " + n(x4 + k2) + " " + n(y4) + " " + n(x4) + " " + n(y4); }
-        else if (B.t >= A.b - 6) { var x5 = (A.l + A.r) / 2, y5 = A.b, x6 = (B.l + B.r) / 2, y6 = B.t, k3 = Math.max(24, (y6 - y5) / 2); p = "M" + n(x5) + " " + n(y5) + "C" + n(x5) + " " + n(y5 + k3) + " " + n(x6) + " " + n(y6 - k3) + " " + n(x6) + " " + n(y6); }
-        else { var x7 = (A.l + A.r) / 2, y7 = A.t, x8 = (B.l + B.r) / 2, y8 = B.b, k4 = Math.max(24, (y7 - y8) / 2); p = "M" + n(x7) + " " + n(y7) + "C" + n(x7) + " " + n(y7 - k4) + " " + n(x8) + " " + n(y8 + k4) + " " + n(x8) + " " + n(y8); }
-        d += '<path d="' + p + '" marker-end="url(#idbAr)"></path>';
-      });
-    });
-    var sig = n(b.scrollWidth) + "x" + n(b.scrollHeight) + "|" + d;
-    if (svg.dataset.sig === sig) return; svg.dataset.sig = sig;
-    svg.setAttribute("width", b.scrollWidth); svg.setAttribute("height", b.scrollHeight);
-    svg.innerHTML = '<defs><marker id="idbAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor" stroke="none"></path></marker></defs>' + d;
-  }
-  (function () {
-    var drag = null;
-    function colAt(x, y) { var e = document.elementFromPoint(x, y); return e && e.closest ? e.closest(".idb-c") : null; }
-    document.addEventListener("pointerdown", function (e) {
-      var g = e.target && e.target.closest ? e.target.closest("[data-idrag]") : null; if (!g || e.button > 0 || !canW && !uid) return;
-      var card = g.closest(".idea"); if (!card) return; e.preventDefault();
-      drag = { id: g.dataset.idrag, el: card, sx: e.clientX, sy: e.clientY, on: false, pid: e.pointerId }; try { g.setPointerCapture(e.pointerId); } catch (x) {}
-    });
-    document.addEventListener("pointermove", function (e) {
-      if (!drag || e.pointerId !== drag.pid) return; var dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
-      if (!drag.on) { if (Math.abs(dx) + Math.abs(dy) < 6) return; drag.on = true; drag.el.classList.add("dragging"); document.body.classList.add("idea-dragging"); }
-      drag.el.style.transform = "translate(" + dx + "px," + dy + "px)";
-      [].forEach.call(document.querySelectorAll(".idb-c.drop"), function (c) { c.classList.remove("drop"); }); var c = colAt(e.clientX, e.clientY); if (c) c.classList.add("drop");
-      if (e.clientY < 70) window.scrollBy(0, -14); else if (e.clientY > window.innerHeight - 70) window.scrollBy(0, 14);
-      ideaArrows();
-    });
-    function end(e, ok) {
-      if (!drag || (e && e.pointerId !== drag.pid)) return; var d = drag; drag = null; document.body.classList.remove("idea-dragging");
-      [].forEach.call(document.querySelectorAll(".idb-c.drop"), function (c) { c.classList.remove("drop"); });
-      d.el.classList.remove("dragging"); d.el.style.transform = "";
-      if (!d.on || !ok) { ideaArrows(); return; }
-      var col = colAt(e.clientX, e.clientY); if (!col) { ideaArrows(); return; }
-      var st = (col.className.match(/st-(\w+)/) || [])[1]; if (!st) { ideaArrows(); return; }
-      var cards = [].filter.call(col.querySelectorAll(".idea[data-id]"), function (c) { return c !== d.el; }), idx = cards.length;
-      for (var i = 0; i < cards.length; i++) { var r = cards[i].getBoundingClientRect(); if (e.clientY < r.top + r.height / 2) { idx = i; break; } }
-      var o = function (c) { var x = byId("personal", c.dataset.id); return x ? ordOf(x) : 0; }, prev = idx > 0 ? o(cards[idx - 1]) : null, next = idx < cards.length ? o(cards[idx]) : null, ord;
-      if (prev == null && next == null) ord = 1; else if (prev == null) ord = next - 1; else if (next == null) ord = prev + 1; else ord = (prev + next) / 2;
-      var x = byId("personal", d.id); if (x) { x.status = st; x.ord = ord; patch("personal", d.id, { status: st, ord: ord }); }
-      sr();
-    }
-    document.addEventListener("pointerup", function (e) { end(e, true); });
-    document.addEventListener("pointercancel", function (e) { end(e, false); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") { if (drag) end(null, false); if (IDEA_LINK) { IDEA_LINK = null; sr(); } } });
-    window.addEventListener("resize", function () { requestAnimationFrame(ideaArrows); });
-    document.addEventListener("scroll", function (e) { if (e.target && e.target.classList && e.target.classList.contains("idb")) ideaArrows(); }, true);
-  })();
-
   /* ---------- 시작 ---------- */
   try { var th0 = localStorage.getItem("tw-theme"); if (th0) document.documentElement.setAttribute("data-theme", th0); } catch (e) {}
   try { var h0 = location.hash.slice(1); if (VIEWS.indexOf(h0) >= 0) ui.view = h0; } catch (e) {}
@@ -3741,7 +3815,11 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       if (col === "personal") return;
       db.collection(col).onSnapshot(function (snap) { clearTimeout(timer); D[col] = snap.docs.map(function (x) { return Object.assign({}, x.data() || {}, { id: x.id }); }); LOADED[col] = true; sr(); }, function (er) { ERR[col] = (er && er.code) || "error"; sr(); });
     });
-    if (uid) db.collection("data/users/" + uid).onSnapshot(function (snap) { D.personal = snap.docs.map(function (x) { return Object.assign({}, x.data() || {}, { id: x.id }); }); LOADED.personal = true; sr(); }, function (er) { ERR.personal = (er && er.code) || "error"; sr(); });
+    if (uid) db.collection("data/users/" + uid).onSnapshot(function (snap) {
+      var onDm = ui.view === "personal" && ui.pcat === "dgm" && !!$("#dmStage"), keep = onDm ? dmDoc() : null, sigOf = function (arr) { return arr.filter(function (x) { return x.kind === "diagram"; }).map(function (x) { return x.id; }).sort().join(","); }, before = onDm ? sigOf(D.personal) : "";
+      D.personal = snap.docs.map(function (x) { return Object.assign({}, x.data() || {}, { id: x.id }); }); LOADED.personal = true;
+      if (onDm) { /* 열어 둔 다이어그램은 내 화면이 최신이다. 글 수정 · 끌기 중 화면이 다시 그려지지 않게 한다 */ if (keep) { var nd = byId("personal", keep.id); if (nd) { nd.nodes = keep.nodes; nd.edges = keep.edges; } } if (sigOf(D.personal) === before) return; }
+      sr(); }, function (er) { ERR.personal = (er && er.code) || "error"; sr(); });
     render();
   })();
 })();
