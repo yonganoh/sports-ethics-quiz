@@ -7,6 +7,9 @@ description: 프리랜서 BOM(통합 계층형 BOM) 작성·갱신. 사용자가
 
 외주·프리랜서 프로젝트에 쓰는 **통합 계층형 BOM** 형식이다. 기준 파일은 Drive `00_공통`의 `스킬_참조파일_목록.md`에 적힌 "프리랜서 BOM 기준 파일"이며, 그 안의 `BOM 양식` 시트가 빈 양식이다. 작성 전에 목록 파일을 읽고 기준 파일을 열어 열과 배치가 같은지 확인한다.
 
+## 속성 매핑 (먼저 읽는다)
+Drive `00_공통`에서 제목이 `SW_속성_매핑`으로 시작하는 최신 파일을 읽는다. 솔리드웍스 사용자 정의 속성(ARTICLE, DWG No. / SPEC., MATERIAL, FINISH, REMARK, QUANTITY, 단위, MODEL TYPE, MAKER 등)을 이 BOM의 어느 열에 넣는지, 구분을 어떻게 계산하는지 그 문서가 정한다. SW에서 저장한 BOM Excel을 받으면 그 문서대로 열을 맞춘다. 속성이 비어 있으면 지어내지 않고 빈칸으로 두고 목록으로 보고한다. 도면 QUANTITY와 BOM 총 수량이 다르면 알린다.
+
 ## 시작 전
 1. `00_START`(Drive `00_공통`의 최신 `00_START*`)의 7장 BOM 규칙을 읽는다.
 2. 근거 자료(STEP 분석 결과, 설계 계획서, 이전 BOM)를 확인한다. 없으면 부족한 정보 목록을 사용자에게 묻는다.
@@ -36,7 +39,7 @@ description: 프리랜서 BOM(통합 계층형 BOM) 작성·갱신. 사용자가
 제작 / 구매 / 외주 / 재사용 / 조립(묶음 행, 금액 없음)
 
 ## 제조사·구매처 분류
-`MCT` / `TURNING` / `NCT·WELDING` / `READY-MADE · 구매처` 네 가지만 쓴다.
+속성 `MODEL TYPE` 값을 그대로 쓴다 (MCT / TURNING / MCT-TURNING / MCT-WELDING / NCT-WELDING / READY-MADE). 구매품은 `READY-MADE · 구매처`로 쓴다.
 
 ## 색 규칙
 노란 칸 + 파란 글씨 = 사람이 입력(단가·납기) / 검은 글씨 = 고정 값 또는 수식 / 초록 글씨 = 다른 시트 참조.
