@@ -740,7 +740,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     ["현황", [["home", "홈"], ["projects", "프로젝트"]]],
     ["협의 · 변경", [["issues", "협의 이슈"], ["ecm", "ECM"], ["partners", "협력사"]]],
     ["일상", [["todo", "TODO · 달력"], ["meetings", "회의록"]]],
-    ["지식", [["refs", "설계 자료실"], ["calcs", "설계 계산"], ["rules", "작업 규칙"]]]
+    ["지식", [["refs", "설계 자료실"], ["calcs", "설계 계산"], ["rules", "작업 규칙"], ["skills", "스킬"]]]
   ];
   var VIEW_OF = { milestones: "projects", modules: "projects", issues: "issues", ecm: "ecm", partners: "partners", meetings: "meetings", calcs: "calcs" };
   var STAGE_NAMES = ["입력·사양", "선행 설계", "모델링", "전기 협의", "설계 검토", "조립성", "2D 도면화", "발표·발주"];
@@ -756,7 +756,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
 
   /* ---------- 상태 ---------- */
   var db = null, user = null, dict = null, sample = null, canW = true, isAdmin = false, mcp = null;
-  var COLS = ["projects", "tasks", "settings", "milestones", "modules", "issues", "ecm", "partners", "contacts", "todos", "meetings", "refs", "calcs", "days"];
+  var COLS = ["projects", "tasks", "settings", "milestones", "modules", "issues", "ecm", "partners", "contacts", "todos", "meetings", "refs", "skills", "calcs", "days"];
   var D = {}, LOADED = {}, ERR = {};
   COLS.forEach(function (c) { D[c] = []; });
   D.personal = [];
@@ -1788,6 +1788,16 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     if (!cur) view = '<div class="card"><div class="empty">' + (LOADED.refs ? "규칙 문서가 없습니다." : "불러오는 중…") + "</div></div>";
     else if (ui.refEdit && canW) view = '<div class="card"><div class="fgrid"><div class="fld w"><label for="rl-title">제목</label><input id="rl-title" data-col="refs" data-id="' + cur.id + '" data-f="title" value="' + esc(cur.title) + '"></div><div class="fld w"><label for="rl-body">내용 (# 제목, ## 소제목, - 목록, **굵게**)</label><textarea id="rl-body" data-col="refs" data-id="' + cur.id + '" data-f="body" rows="26">' + esc(cur.body) + '</textarea></div></div><div class="acts" style="margin-top:12px"><button class="btn pri" data-act="ref-edit">보기로 돌아가기</button></div></div>';
     else view = '<div class="card"><div class="acts" style="justify-content:space-between;margin-bottom:6px"><span class="pill p-acc">' + esc(RULE_CAT) + "</span>" + (canW ? '<button class="btn sm" data-act="ref-edit">편집</button>' : "") + '</div><div class="md refmd">' + mdRich(cur.body || "") + "</div></div>";
+    return h + '<div class="refs-lay">' + side + view + "</div>";
+  }
+  function vSkills() {
+    var list = sorted("skills", function (a, b) { return (a.order || 0) - (b.order || 0) || ((a.title || "") < (b.title || "") ? -1 : 1); });
+    var cur = ui.skillId && byId("skills", ui.skillId) ? byId("skills", ui.skillId) : list[0];
+    var h = head("", "스킬", "내가 만든 명령·스킬과 새로 설치한 스킬의 사용법을 모아 둔 곳입니다.", "");
+    var side = '<div class="card" style="padding:10px"><div id="skillList">' + (list.length ? list.map(function (r) { return '<button class="ritem" data-act="skill-open" data-id="' + r.id + '"' + (cur && cur.id === r.id ? ' aria-current="true"' : "") + "><b style='font-size:13px'>" + esc(r.title) + "</b>" + (r.kind ? "<div class='muted sm'>" + esc(r.kind) + "</div>" : "") + "</button>"; }).join("") : '<div class="empty">' + (LOADED.skills ? "스킬 문서가 없습니다." : "불러오는 중…") + "</div>") + "</div></div>";
+    var view;
+    if (!cur) view = '<div class="card"><div class="empty">' + (LOADED.skills ? "스킬 문서가 없습니다." : "불러오는 중…") + "</div></div>";
+    else view = '<div class="card"><div class="acts" style="margin-bottom:6px">' + (cur.kind ? '<span class="pill p-acc">' + esc(cur.kind) + "</span>" : "") + (cur.status ? '<span class="pill ' + (cur.status === "설치됨" ? "p-ok" : "p-warn") + '">' + esc(cur.status) + "</span>" : "") + '</div><div class="md refmd">' + mdRich(cur.body || "") + "</div></div>";
     return h + '<div class="refs-lay">' + side + view + "</div>";
   }
   function vCalcs() {
@@ -3094,8 +3104,8 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   }
 
   /* ---------- 렌더 ---------- */
-  var GROUPS = [["home", "홈", ["home"], ICON.home], ["projects", "프로젝트", ["projects"], ICON.projects], ["talk", "협의 · 변경", ["issues", "ecm", "partners"], ICON.issues], ["daily", "TODO · 회의록", ["todo", "meetings"], ICON.todo], ["me", "개인", ["personal"], "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"], ["know", "자료실 · 계산 · 규칙", ["refs", "calcs", "rules"], ICON.refs]];
-  var VNAME = { issues: "협의 이슈", ecm: "ECM", partners: "협력사", todo: "TODO · 달력", meetings: "회의록", refs: "설계 자료실", calcs: "설계 계산", rules: "작업 규칙" }, LASTV = {};
+  var GROUPS = [["home", "홈", ["home"], ICON.home], ["projects", "프로젝트", ["projects"], ICON.projects], ["talk", "협의 · 변경", ["issues", "ecm", "partners"], ICON.issues], ["daily", "TODO · 회의록", ["todo", "meetings"], ICON.todo], ["me", "개인", ["personal"], "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"], ["know", "자료실 · 계산 · 규칙 · 스킬", ["refs", "calcs", "rules", "skills"], ICON.refs]];
+  var VNAME = { issues: "협의 이슈", ecm: "ECM", partners: "협력사", todo: "TODO · 달력", meetings: "회의록", refs: "설계 자료실", calcs: "설계 계산", rules: "작업 규칙", skills: "스킬" }, LASTV = {};
   function groupOf(v) { for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i][2].indexOf(v) >= 0) return GROUPS[i][0]; return "home"; }
   function pillItems() {
     var g = groupOf(ui.view), ps = projects();
@@ -3166,7 +3176,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     var v = ui.view, h = "";
     if (v === "home") h = vHome(); else if (v === "projects") h = vProjects();
     else if (v === "issues" || v === "ecm" || v === "partners") h = vTable(v); else if (v === "todo") h = vTodo(); else if (v === "meetings") h = vMeetings();
-    else if (v === "refs") h = vRefs(); else if (v === "calcs") h = vCalcs(); else if (v === "rules") h = vRules(); else if (v === "personal") h = vPersonal();
+    else if (v === "refs") h = vRefs(); else if (v === "calcs") h = vCalcs(); else if (v === "rules") h = vRules(); else if (v === "skills") h = vSkills(); else if (v === "personal") h = vPersonal();
     rebuildHol();
     var banner = "";
     if (!db && booted) banner = '<div class="banner">데이터베이스에 연결하지 못했습니다. 새로고침하거나 다시 로그인해 주세요.</div>';
@@ -3588,6 +3598,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       case "mt-copy": { var mm = ui.detail && byId("meetings", ui.detail.id); if (!mm) break; var tx = meetText(mm), ok2 = function () { toast("정리 내용을 복사했습니다"); }, fb2 = function () { var ta2 = document.createElement("textarea"); ta2.value = tx; ta2.style.cssText = "position:fixed;left:0;top:0;opacity:0"; document.body.appendChild(ta2); ta2.select(); try { document.execCommand("copy"); ok2(); } catch (x) { toast("복사하지 못했습니다"); } ta2.remove(); }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tx).then(ok2, fb2); else fb2(); break; }
       case "ref-open": ui.refId = id; ui.refEdit = false; sr(); break;
       case "rule-open": ui.ruleId = id; ui.refEdit = false; sr(); break;
+      case "skill-open": ui.skillId = id; sr(); break;
       case "ref-edit": ui.refEdit = !ui.refEdit; sr(); break;
     }
   }
@@ -3849,6 +3860,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   })();
 })();
 </script>
+
 
 </body>
 </html>
