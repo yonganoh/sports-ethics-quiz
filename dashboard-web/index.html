@@ -772,6 +772,13 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     return String(v == null ? "" : v).split(/\s*[·,\/、]\s*/).map(function (x) { return x.trim().replace(re, "").replace(/\s+/g, ""); }).filter(Boolean).filter(function (x, i, a) { return a.indexOf(x) === i; }).join("·");
   }
   function modOwners(m) { var o = ownerName(m.owner); return o ? o.split("·") : []; }
+  /* 상대 담당자 후보: 이 프로젝트 연락처(관리자에게만 불러옴) + 이슈 · ECM에 이미 쓴 이름 */
+  function contactNames(pid) {
+    var seen = {}, out = [];
+    (D.contacts || []).forEach(function (c) { if (pidOf(c) === pid && c.name && !/미확인/.test(c.name) && !seen[c.name]) { seen[c.name] = 1; out.push([c.name, [c.org, c.title].filter(Boolean).join(" · ")]); } });
+    D.issues.concat(D.ecm).forEach(function (x) { var n = ownerName(x.contact); if (n && pidOf(x) === pid) n.split("·").forEach(function (q) { if (!seen[q]) { seen[q] = 1; out.push([q, ""]); } }); });
+    return out;
+  }
   function ownerList(pid) {
     var seen = {}, out = [], none = false;
     modSorted(pid).forEach(function (m) { var o = modOwners(m); if (!o.length) none = true; o.forEach(function (n) { if (!seen[n]) { seen[n] = 1; out.push(n); } }); });
@@ -982,14 +989,14 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       { f: "owner", l: "담당", t: "text" }, { f: "start", l: "시작일", t: "date" }, { f: "target", l: "목표일", t: "date" }, { f: "newTarget", l: "변경 목표일", t: "date" }, { f: "delayReason", l: "지연 사유", t: "text", w: 1 },
       { f: "issue", l: "현재 이슈", t: "area", w: 1 }, { f: "note", l: "메모·진행 내용", t: "area", w: 1, r: 6 }], def: function () { return { projectId: ui.pid, code: "CDFE ", name: "새 모듈", kind: "self", stages: {}, post: "작업 중", revs: [], order: 99 }; } },
     issues: { name: "협의 이슈", title: "title", back: "협의 이슈", addLabel: "이슈 추가", filter: ["status", ["전체", "열림", "답변대기", "닫힘"]],
-      cols: [["title", "이슈", "pri"], ["who", "상대"], ["module", "모듈", "mod"], ["due", "회신 기한", "due"], ["status", "상태", "pill"]],
-      fields: [{ f: "title", l: "이슈", t: "text", w: 1 }, { f: "projectId", l: "프로젝트", t: "proj" }, { f: "who", l: "상대", t: "sel", o: WHO }, { f: "module", l: "관련 모듈", t: "mod" }, { f: "asked", l: "요청일", t: "date" }, { f: "due", l: "회신 기한", t: "date" },
+      cols: [["title", "이슈", "pri"], ["who", "상대"], ["contact", "상대 담당자"], ["module", "모듈", "mod"], ["due", "회신 기한", "due"], ["status", "상태", "pill"]],
+      fields: [{ f: "title", l: "이슈", t: "text", w: 1 }, { f: "projectId", l: "프로젝트", t: "proj" }, { f: "who", l: "상대", t: "sel", o: WHO }, { f: "contact", l: "상대 담당자 (이름만)", t: "text" }, { f: "module", l: "관련 모듈", t: "mod" }, { f: "asked", l: "요청일", t: "date" }, { f: "due", l: "회신 기한", t: "date" },
         { f: "status", l: "상태", t: "sel", o: ISS_ST }, { f: "ecm", l: "연결 ECM 번호", t: "text" }, { f: "body", l: "내용", t: "area", w: 1, r: 5 }, { f: "answer", l: "답변·결과", t: "area", w: 1, r: 5 }],
       def: function () { return { projectId: ui.pid, title: "새 이슈", who: defWho(ui.pid), status: "열림", asked: TODAY() }; } },
     ecm: { name: "ECM", title: "title", back: "ECM", addLabel: "ECM 추가", filter: ["status", ["전체", "검토중", "승인", "완료"]],
-      cols: [["no", "번호", "mono"], ["title", "제목", "pri"], ["module", "모듈", "mod"], ["start", "시행일", "date"], ["end", "완료일", "date"], ["status", "상태", "pill"]],
+      cols: [["no", "번호", "mono"], ["title", "제목", "pri"], ["contact", "상대 담당자"], ["module", "모듈", "mod"], ["start", "시행일", "date"], ["end", "완료일", "date"], ["status", "상태", "pill"]],
       fields: [{ f: "projectId", l: "프로젝트", t: "proj" }, { f: "no", l: "ECM 번호", t: "text" }, { f: "title", l: "제목", t: "text" }, { f: "status", l: "상태", t: "sel", o: ECM_ST }, { f: "module", l: "연결 모듈", t: "mod" },
-        { f: "who", l: "요청자", t: "sel", o: WHO }, { f: "rev", l: "도면 Rev", t: "text" }, { f: "start", l: "시행일", t: "date" }, { f: "end", l: "완료일", t: "date" },
+        { f: "who", l: "요청자", t: "sel", o: WHO }, { f: "contact", l: "상대 담당자 (이름만)", t: "text" }, { f: "rev", l: "도면 Rev", t: "text" }, { f: "start", l: "시행일", t: "date" }, { f: "end", l: "완료일", t: "date" },
         { f: "reason", l: "변경 사유", t: "area", w: 1 }, { f: "impact", l: "영향 (무게·치수·전장)", t: "area", w: 1 }, { f: "note", l: "내용", t: "area", w: 1, r: 6 }],
       def: function () { var p = "ECM" + TODAY().slice(2).replace(/-/g, ""), n = D.ecm.filter(function (e) { return (e.no || "").indexOf(p) === 0; }).length + 1; return { projectId: ui.pid, no: p + "-" + pad(n), title: "새 설계변경", status: "검토중", who: "성신" }; } },
     partners: { name: "협력사", title: "company", back: "협력사", addLabel: "협력사 추가",
@@ -1008,6 +1015,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   function fInput(col, doc, F) {
     var v = doc[F.f] == null ? "" : doc[F.f];
     var at = 'data-col="' + col + '" data-id="' + doc.id + '" data-f="' + F.f + '" id="f-' + F.f + '"' + (canW ? "" : " disabled");
+    if (F.f === "contact" && (col === "issues" || col === "ecm") && F.t === "text") return "<input " + at + ' value="' + esc(v) + '" list="ctDl" placeholder="이름만 (예: 한국현)" autocomplete="off"><datalist id="ctDl">' + contactNames(pidOf(doc) || ui.pid).map(function (x) { return '<option value="' + esc(x[0]) + '"' + (x[1] ? ' label="' + esc(x[1]) + '"' : "") + ">"; }).join("") + "</datalist>";
     if (F.f === "owner" && (col === "modules" || col === "tasks") && F.t === "text") return "<input " + at + ' value="' + esc(v) + '" list="ownerDl" placeholder="이름만 (예: 오용안)" autocomplete="off"><datalist id="ownerDl">' + ownerList(pidOf(doc) || ui.pid).names.map(function (n) { return '<option value="' + esc(n) + '">'; }).join("") + "</datalist>";
     if (F.t === "area") return "<textarea " + at + ' rows="' + (F.r || 3) + '">' + esc(v) + "</textarea>";
     if (F.t === "date") return '<input type="date" ' + at + ' value="' + esc(v) + '">';
@@ -3591,7 +3599,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     if (d.orgtype !== undefined) { if (!canW) return; D.contacts.forEach(function (c) { if (pidOf(c) === ui.pid && (c.org || "(조직 미지정)") === d.orgtype) { c.orgType = el.value; patch("contacts", c.id, { orgType: el.value }); } }); sr(); return; }
     if (d.f && d.col) {
       if (!canW) return;
-      var v = el.type === "number" ? (el.value === "" ? null : Number(el.value)) : el.value, obj = {}; if (d.f === "owner" && (d.col === "modules" || d.col === "tasks")) { v = ownerName(v); if (el.value !== v) el.value = v; } obj[d.f] = v;
+      var v = el.type === "number" ? (el.value === "" ? null : Number(el.value)) : el.value, obj = {}; if ((d.f === "owner" && (d.col === "modules" || d.col === "tasks")) || (d.f === "contact" && (d.col === "issues" || d.col === "ecm"))) { v = ownerName(v); if (el.value !== v) el.value = v; } obj[d.f] = v;
       if (d.col === "days") { var ex = byId("days", d.id); if (ex) ex.note = v; else D.days.push({ id: d.id, note: v }); write("days", d.id, function (p) { p.note = v; return p; }); return; }
       if (d.col === "tasks" && d.f === "start") { var tk = byId("tasks", d.id); if (tk && DATE_RE.test(v || "") && DATE_RE.test(tk.end || "") && tk.end < v) { obj.end = v; tk.end = v; toast("마감일이 시작일보다 빨라서 같이 옮겼습니다"); } }
       var doc = byId(d.col, d.id); if (doc) doc[d.f] = v;
