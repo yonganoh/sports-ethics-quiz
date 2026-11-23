@@ -39,7 +39,7 @@ Drive `00_공통`에서 제목이 `SW_속성_매핑`으로 시작하는 최신 �
 제작 / 구매 / 외주 / 재사용 / 조립(묶음 행, 금액 없음)
 
 ## 제조사·구매처 분류
-속성 `MODEL TYPE` 값을 그대로 쓴다 (MCT / TURNING / MCT-TURNING / MCT-WELDING / NCT-WELDING / READY-MADE). 구매품은 `READY-MADE · 구매처`로 쓴다.
+속성 `MODEL TYPE` 값을 그대로 쓴다 (값 목록은 속성 매핑 문서 기준). 구매품은 `READY-MADE · 구매처`로 쓴다.
 
 ## 색 규칙
 노란 칸 + 파란 글씨 = 사람이 입력(단가·납기) / 검은 글씨 = 고정 값 또는 수식 / 초록 글씨 = 다른 시트 참조.
