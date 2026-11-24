@@ -5,7 +5,7 @@ argument-hint: [프로젝트] [모듈]
 
 설계 시작 명령이다. 인자: $ARGUMENTS
 
-1. Google Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일(현재 ID `1wBr7PuFRxYPoO4eSwgsh9xeb_wsvg5rY`)을 읽는다.
+1. Google Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일(현재 ID `1WDHgayDX35YTe1eB-RUqUWc0OTXqFL-G`)을 읽는다.
 2. 대시보드 https://claude.ai/artifact/SpewTfA39w8nvXMfmCx19F 의 `refs` 컬렉션 `r00-guide`를 ArtifactData로 읽는다.
 3. `00_START` 2장의 순서대로 진행한다.
    - 필요 정보를 한 번에 모아 선택형으로 묻는다. 이미 아는 것은 묻지 않는다.
