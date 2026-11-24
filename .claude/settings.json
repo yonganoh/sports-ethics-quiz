@@ -6,6 +6,7 @@
       "mcp__Google_Drive__search_files",
       "mcp__Google_Drive__get_file_metadata",
       "mcp__Google_Drive__list_recent_files",
+      "mcp__Google_Drive__trash_file",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
