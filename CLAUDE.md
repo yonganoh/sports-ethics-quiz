@@ -23,7 +23,7 @@
 
 ## 먼저 읽을 것 (순서대로)
 
-1. Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일. 현재 ID `1WDHgayDX35YTe1eB-RUqUWc0OTXqFL-G`.
+1. Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일. 현재 ID `1JdMXW15G64glcovMJBj5r4rIebwppJdJ`.
 2. 대시보드 https://claude.ai/artifact/SpewTfA39w8nvXMfmCx19F 의 `refs` 컬렉션 `r00-guide` (작업 지침). ArtifactData 도구로 읽는다.
 3. "설계 이어서"일 때: `00_공통`에서 제목에 `핸드오프`가 들어간 해당 모듈의 최신 파일(날짜·Rev가 가장 큰 것), 대시보드 `modules` 컬렉션의 해당 모듈 문서.
 
@@ -46,6 +46,7 @@
 - 값에는 [확정] [가정] [미확인]을 붙이고 계산 뒤에 쉬운 말 한 줄을 붙인다.
 - 글은 적게. 산출물에 AI·도구 이름을 적지 않는다.
 - 저장하는 모든 문서의 파일 이름은 `#날짜_이름_Rev번호` 하나로 통일한다 (예: `#20261124_핸드오프 [모듈]_Rev1.md`, 날짜는 YYYYMMDD). 규칙·참조 파일(`00_START…`, `에이전트_*.md`, `템플릿_*`)과 기존 파일은 이름을 바꾸지 않는다.
+- 새 Rev를 만들면 같은 문서의 이전 Rev 파일·폴더는 바로 Drive 휴지통으로 보낸다(묻지 않는다, 사용자 승인 2026-11-24). 사용자가 직접 만든 파일, 마지막 확정본, 같은 문서인지 불확실한 파일은 제외하고 묻는다. 리비전(버전 기록)은 관리하지 않는다.
 - 도면 공차는 숫자로만 적는다 (H7 같은 문자 기호 금지).
 - 지시 없이 도면·BOM·모델·Drive 파일을 고치지 않는다.
 - 규칙 파일(`CLAUDE.md`, `.claude/` 전체: agents, commands, skills, settings)을 고치면 Claude가 직접 push하고 PR을 만들어 main에 합친다 (사용자 승인, 2026-11-22). 그 밖의 변경은 평소대로 확인을 받는다.
