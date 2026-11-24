@@ -1,0 +1,14 @@
+---
+description: Mechanical design CONTINUE · 설계 이어서 [모듈] — 최신 핸드오프를 읽고 현재 상태를 5줄로 보고한 뒤 이어서 진행
+argument-hint: [모듈]
+---
+
+설계 이어서 명령이다. 인자: $ARGUMENTS
+
+1. Google Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일을 읽는다.
+2. 대시보드 https://claude.ai/artifact/SpewTfA39w8nvXMfmCx19F 의 `refs` 컬렉션 `r00-guide`와 `modules` 컬렉션의 해당 모듈 문서를 ArtifactData로 읽는다.
+3. `00_공통`에서 제목에 `핸드오프`가 들어간 해당 모듈의 최신 파일(날짜·Rev가 가장 큰 것)을 읽는다.
+4. **현재 상태를 5줄로 보고**한다 (결정된 것, 진행 중인 것, 남은 질문, 다음 할 일).
+5. 사용자가 확인하면 하던 곳부터 이어서 진행한다. 단계마다 승인을 받는다.
+
+인자가 없으면 어느 모듈인지 먼저 묻는다. 지시 없이 Drive 파일을 고치지 않는다.
