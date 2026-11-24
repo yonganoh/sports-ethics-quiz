@@ -29,7 +29,7 @@
 
 ## 먼저 읽을 것 (순서대로)
 
-1. Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일. 현재 ID `1JdMXW15G64glcovMJBj5r4rIebwppJdJ`.
+1. Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일. 현재 ID `1gGBKtP9QIYSmwnNMXrPm0IYqCeW6Ia7i`.
 2. 대시보드 https://claude.ai/artifact/SpewTfA39w8nvXMfmCx19F 의 `refs` 컬렉션 `r00-guide` (작업 지침). ArtifactData 도구로 읽는다.
 3. "설계 이어서"일 때: `00_공통`에서 제목에 `핸드오프`가 들어간 해당 모듈의 최신 파일(날짜·Rev가 가장 큰 것), 대시보드 `modules` 컬렉션의 해당 모듈 문서.
 

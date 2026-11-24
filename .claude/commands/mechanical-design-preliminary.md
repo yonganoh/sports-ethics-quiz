@@ -7,7 +7,7 @@ argument-hint: [프로젝트] [모듈]
 
 설계 시작과 같은 질문을 한 번에 모아 묻고, 답을 받으면 에이전트를 **전부** 실행한다.
 
-1. Google Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일(현재 ID `1JdMXW15G64glcovMJBj5r4rIebwppJdJ`)을 읽는다.
+1. Google Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일(현재 ID `1gGBKtP9QIYSmwnNMXrPm0IYqCeW6Ia7i`)을 읽는다.
 2. 대시보드 https://claude.ai/artifact/SpewTfA39w8nvXMfmCx19F 의 `refs` 컬렉션 `r00-guide`(19번 선행설계 명령)와 `r01-rules`를 ArtifactData로 읽는다.
 3. 필요 정보를 한 번에 모아 선택형으로 묻는다. 이미 아는 것은 묻지 않는다. **실행 방식은 묻지 않는다** (에이전트 전부 실행).
 4. 편성: 기본 6명 전원. 최소 `mech-design-assist`(기구설계 보조) + `design-reviewer`(설계 검토자)는 뺄 수 없다. 사용자가 "최소로" · "절약"이라고 하면 이 2명만 실행한다.
