@@ -15,6 +15,12 @@
 
 같은 4개를 슬래시 명령으로도 쓸 수 있다 (파일: `.claude/commands/`). 영문 이름: `/mechanical-design-start`, `/mechanical-design-continue`, `/mechanical-design-wrapup`, `/mechanical-design-preliminary` (`/mech`까지 치면 4개가 나온다). 한글 이름 `/설계시작`, `/설계이어서`, `/설계정리`, `/선행설계`도 같은 내용이다. 두 벌의 내용은 항상 같게 유지한다. 말로 시작해도 같은 흐름이다.
 
+## PPT 제작
+
+- PPT·발표자료·슬라이드는 `ppt-master` 스킬이 **유일한 기준**이다 (파일: `.claude/skills/ppt-master/`). 명령은 `/ppt master [주제·용도]` (한글 별칭 없음). 말로 "PPT 만들어줘", "PPT Master로"라고 해도 같다.
+- 본 제작은 오픈소스 PPT Master(`hugohe3/ppt-master`)를 쓸 때마다 읽기 전용으로 받아서 한다. 저장소에는 넣지 않는다. 만든 PPT와 프로젝트 폴더도 공개 저장소에 올리지 않는다.
+- 표지 표기·회사 샘플 양식은 Drive 규칙 원문(`00_START` 7장, `작업규칙_PPT…`)을 따른다.
+
 ## 선행설계 편성
 
 - 기본은 6명 전원(`system-design` → `mech-design-assist` → `electrical-liaison` → (사용자 모델링) → `design-reviewer` → `assembly-reviewer` → `docs-presenter`). 최소 편성은 `mech-design-assist` + `design-reviewer` 2명이며, 사용자가 "최소로" · "절약"이라고 할 때만 이 2명으로 줄인다. 이 2명은 빼지 않는다.
