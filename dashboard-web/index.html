@@ -112,7 +112,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow); min-width: 0; }
 .card > h2 { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 .card > h2 a, .linkbtn { font-size: 12px; font-weight: 500; color: var(--accent); background: none; border: 0; cursor: pointer; padding: 0; }
-.g3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; }
+.g3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr)); gap: 14px; }
 .g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 14px; align-items: start; }
 .big { font-family: var(--font-mono); font-size: 34px; font-weight: 500; line-height: 1.1; letter-spacing: -.02em; }
 .big small { font-size: 13px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-left: 4px; }
@@ -268,7 +268,7 @@ td.pri { font-weight: 700; min-width: 180px; overflow-wrap: anywhere; }
 .sum-card.bad { border-color: color-mix(in srgb, var(--bad) 50%, var(--line)); } .sum-card.bad .v { color: var(--bad); }
 .meter { height: 8px; background: var(--surface-2); border-radius: 4px; margin-top: 8px; overflow: hidden; }
 .meter > i { display: block; height: 100%; background: var(--accent); }
-.dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; align-items: start; }
+.dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 14px; align-items: start; }
 .alist { list-style: none; margin: 0; padding: 0; }
 .alist li { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); align-items: flex-start; }
 .alist li:last-child { border-bottom: 0; } .alist li.go { cursor: pointer; } .alist li.go:hover b { text-decoration: underline; }
@@ -355,7 +355,7 @@ td.pri { font-weight: 700; min-width: 180px; overflow-wrap: anywhere; }
 .flow { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; counter-reset: step; } .flow li { list-style: none; counter-increment: step; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: 13px; } .flow li::before { content: counter(step); font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-right: 8px; } .flow li.me { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); } .flow small { display: block; color: var(--muted); font-size: 11px; }
 pre.tree { margin: 0; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; overflow-x: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; }
 .check { margin: 0; padding: 0; columns: 2 260px; column-gap: 28px; } .check li { list-style: none; break-inside: avoid; padding: 3px 0 3px 24px; position: relative; font-size: 13px; } .check li::before { content: ""; position: absolute; left: 0; top: 8px; width: 12px; height: 12px; border: 1.5px solid var(--muted); border-radius: 2px; }
-.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; align-items: start; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 14px; align-items: start; }
 /* ===== v3 스킨: 소프트 스큐어모피즘 ===== */
 .bx-t td, .bx-t th { white-space: normal; text-align: left; width: auto !important; vertical-align: top; overflow-wrap: anywhere; line-height: 1.5; }
 .bx-add { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 8px; } .bx-add select { max-width: 100%; white-space: normal; height: auto; }
@@ -465,6 +465,9 @@ svg text { letter-spacing: 0; word-spacing: 0; }
 .acc-c { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); box-shadow: var(--sh-well); font-size: 18px; line-height: 1; transition: transform .2s; }
 .acc.open .acc-c { transform: rotate(90deg); background: var(--accent); color: #1E1917; box-shadow: none; }
 .acc-t { font-weight: 800; font-size: 15.5px; flex: none; max-width: 100%; }
+@media (max-width: 640px) { .acc-t { flex: 1 1 0; min-width: 0; } .board table.stk { min-width: 0; } }
+#pill .pb, #pill .pb * { white-space: nowrap !important; }
+.board td:last-child { min-width: 108px; }
 .acc-s { color: var(--muted); font-size: 13px; flex: 1; min-width: 0; line-height: 1.45; }
 .acc-o { flex: none; font-size: 12px; color: var(--muted); }
 .acc-b { padding: 0 20px 20px; }
@@ -539,7 +542,7 @@ body.dragging, body.dragging * { cursor: ew-resize !important; user-select: none
 .iso-pick { font-size: 14px; line-height: 1.6; margin: -2px 0 10px; } .iso-pick b { color: var(--accent-t); }
 .iso-tips { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 12px; line-height: 1.7; font-size: 13px; } .iso-tips li { padding-left: 12px; border-left: 3px solid var(--accent); } .iso-tips.sm { gap: 6px; margin-top: 6px; }
 .fgrid { gap: 18px 16px; }
-.iso-lay { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); gap: 18px; align-items: start; margin-top: 10px; }
+.iso-lay { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(min(300px, 100%), 1fr); gap: 18px; align-items: start; margin-top: 10px; }
 @media (max-width: 980px) { .iso-lay { grid-template-columns: minmax(0, 1fr); } }
 .iso-out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); }
 @media (max-width: 980px) { .iso-out { position: static; } }
@@ -558,7 +561,7 @@ a, .linkbtn, .card > h2 a { color: var(--accent-t); }
 .mono, .big, .dd, .cnt { font-variant-numeric: tabular-nums; letter-spacing: 0; }
 .app { display: flex; flex-direction: column; gap: 14px; min-height: 100%; padding-block: 12px 104px; padding-left: max(98px, calc(env(safe-area-inset-left, 0px) + 98px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
 .frame { background: var(--bg); border-radius: 32px; box-shadow: var(--sh-frame); border: 1px solid var(--bd-card); padding: 26px; min-height: 60vh; min-width: 0; }
-.wrap { max-width: 1240px; }
+.wrap { max-width: 1240px; grid-template-columns: minmax(0, 1fr); }
 #main { transition: opacity .2s var(--ease), transform .2s var(--ease); transform-origin: 50% 0; }
 #main.leave { opacity: 0; transform: scale(.97) translateY(-8px); transition: opacity .16s ease, transform .16s ease; }
 @keyframes rise { from { opacity: 0; transform: translateY(20px) scale(.98); } to { opacity: 1; transform: none; } }
@@ -1684,7 +1687,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   function wsFlow(p) {
     var tree = esc(p.name) + "/\n" + DF.map(function (f, i) { return (i === DF.length - 1 ? "└─ " : "├─ ") + f[1] + "/"; }).join("\n");
     return '<div class="card"><h2>업무 흐름</h2><ol class="flow"><li>시스템설계 담당<small>입력 조건서</small></li><li>선행 설계 담당<small>선행 설계서, 도면, DXF, 개념 STEP</small></li><li class="me">사용자<small>3D 모델링, STEP 전달</small></li><li>기구설계 보조<small>제작 정보서 (공차, 용접, 가공)</small></li><li>전기팀 담당<small>전기 협의표</small></li><li class="me">사용자<small>도면</small></li><li>설계 검토자<small>설계 검토 보고서</small></li><li>조립팀 담당<small>조립성 검토서</small></li><li>서류·발표 담당<small>발표자료 PPTX·PDF, BOM</small></li><li class="me">사용자<small>임원 발표, 승인</small></li><li>발주 · 조립 · 설치</li></ol><ul class="plines" style="margin-top:10px"><li>선행 설계 담당은 초도 컨셉과 선정 근거를 주고, 사용자는 모델링만 합니다.</li><li>기구설계 보조와 전기팀 담당은 서로 확인하며 반복합니다.</li><li>설계 검토자와 조립팀 담당도 지적 사항을 서로 주고받습니다.</li></ul></div>' +
-      '<div class="two"><div class="card"><h2>Google Drive 저장 구조</h2><ul class="plines"><li>각 에이전트가 산출물을 저장하고, 다음 에이전트는 앞 단계 폴더의 <b>최신 확정본</b>을 읽습니다.</li><li>새 프로젝트를 만들면 같은 구조가 자동으로 만들어집니다.</li></ul><pre class="tree">' + tree + '</pre><p><b>파일명</b><br><span class="mono">[모듈코드]_[문서]_v01_YYYYMMDD</span></p><p><b>문서 상태</b><br>작성중 → 검토요청 → 확정<br>다음 에이전트는 <b>확정</b>인 최신 버전만 읽습니다.<br>수정은 덮어쓰지 않고 버전을 올립니다.</p></div>' +
+      '<div class="two"><div class="card"><h2>Google Drive 저장 구조</h2><ul class="plines"><li>각 에이전트가 산출물을 저장하고, 다음 에이전트는 앞 단계 폴더의 <b>최신 확정본</b>을 읽습니다.</li><li>새 프로젝트를 만들면 같은 구조가 자동으로 만들어집니다.</li></ul><pre class="tree">' + tree + '</pre><p><b>파일명</b><br><span class="mono">#날짜_이름_Rev번호</span><br>예: #20261121_교반탈포기 설계발표_Rev2 (날짜는 YYYYMMDD)</p><p><b>문서 상태</b><br>작성중 → 검토요청 → 확정<br>다음 에이전트는 <b>확정</b>인 최신 버전만 읽습니다.<br>수정은 덮어쓰지 않고 Rev를 올립니다. 이전 Rev는 같은 폴더의 99_이력으로 옮깁니다.</p></div>' +
       '<div class="card"><h2>공통 규칙 (모든 에이전트)</h2><ol class="rules"><li>필수 입력 정보가 없으면 작업을 시작하지 않고 <b>부족 정보 목록</b>만 돌려줍니다. 추측으로 채우지 않습니다.</li><li>모든 수치와 조건에 <b>[확정] / [가정] / [미확인]</b> 상태를 붙입니다.</li><li>계산과 검토에는 근거(식, 가정값)를 함께 적습니다.</li><li>산출물은 아래 규격 양식으로만 작성합니다.</li><li>최종 판단과 승인은 사용자가 합니다.</li></ol></div></div>' +
       '<div class="card"><h2>산출물 양식</h2><div class="tw"><table><thead><tr><th>문서</th><th>담당</th><th>구성</th></tr></thead><tbody>' + FORMS.map(function (f) { return "<tr><td><b>" + esc(f[0]) + "</b></td><td>" + esc(f[1]) + "</td><td>" + esc(f[2]) + "</td></tr>"; }).join("") + '</tbody></table></div></div><div class="card"><h2>설계 검토 체크리스트</h2><ul class="check">' + CHECKS.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ul></div>";
   }
