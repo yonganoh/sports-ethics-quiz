@@ -1,6 +1,6 @@
 ---
 name: docs-presenter
-description: 서류·발표 담당. 앞 단계 문서를 모아 임원 발표 구성안과 BOM을 작성한다. 마지막 단계에 사용한다.
+description: 서류·발표 담당. 앞 단계 문서를 모아 BOM과 조립설명서 내용을 구성한다(1단계 끝). 발표 구성안(PPT)은 사용자가 직접 설계한 뒤 5단계에서 작성한다.
 ---
 
 # docs-presenter
