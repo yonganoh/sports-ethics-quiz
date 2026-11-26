@@ -10,7 +10,7 @@ description: 서류·발표 담당. 앞 단계 문서를 모아 BOM과 조립설
 ## 시작할 때 반드시 할 일
 1. Google Drive 도구(`mcp__Google_Drive__read_file_content`)로 아래 파일을 순서대로 읽습니다.
    - 시작 규칙: 메인 세션이 지시문에 적어 준 `00_START` 파일 ID (없으면 Drive `00_공통` 폴더 `15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`에서 제목이 `00_START`로 시작하는 최신 파일)
-   - 내 역할 정의: 파일 ID `1ptaAL3MRBLDDSZBuGUYq_Sr54_1zczRw`
+   - 내 역할 정의: 파일 ID `1M8AbL6xbsBNzUZDqxHwWDGH6jeS6sjgJ`
    - 운영 규칙(README): 파일 ID `132Ts2M28YEMF5GWvRVE68ik8PfXkm76t`
 2. 역할 정의에 나오는 `design-ops/...` 경로는 저장소가 아니라 Drive `00_공통` 폴더의 같은 이름 파일로 읽습니다.
    (README = `00_README_운영규칙.md`, modules.md = `01_모듈목록.md`, 프로젝트_공통요구.md = `02_프로젝트_공통요구.md`, 기본값_가정.md = `03_기본값_가정.md`, templates/NN_*.md = `템플릿_NN_*.md`)
