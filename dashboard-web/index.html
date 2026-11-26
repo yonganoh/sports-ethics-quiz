@@ -1502,6 +1502,28 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   var DOCS = { pid: "", list: [], loaded: false, busy: false, err: "", curId: "", html: "", title: "", url: "" };
   var projFolders = function (p) { return (p.drive && p.drive.folders) || {}; };
   function docLabel(k) { var r = DF.filter(function (x) { return x[0] === k; })[0]; return r ? r[1] : k; }
+  /* --- 문서 탭: 같은 문서는 최신 것만 (이름에서 날짜 · Rev · 버전을 떼고 묶는다) --- */
+  function docKey(t) {
+    var s = String(t || "").replace(/\.[A-Za-z0-9]{1,5}$/, "");
+    s = s.replace(/^#?\d{6,8}[_ ]+/, "").replace(/[_ ]+(Rev|R|v|V)\.?\s?\d+(\.\d+)?(?=$|[_ ])/g, "").replace(/[_ ]+\d{8}(?=$|[_ ])/g, "").replace(/[_ ]+\d{1,2}$/, "");
+    return s.replace(/[_\s]+/g, " ").trim().toLowerCase();
+  }
+  function docRank(f) {
+    var t = String(f.title || ""), d = (t.match(/(?:^#?|[_ ])(20\d{6})(?=$|[_ .])/) || t.match(/^#?(\d{6})[_ ]/) || [])[1] || "", r = (t.match(/(?:Rev|[_ ]R|[_ ]v|[_ ]V)\.?\s?(\d+(?:\.\d+)?)/) || [])[1] || "0";
+    if (d.length === 6) d = "20" + d;
+    return [d, parseFloat(r) || 0, String(f.modifiedTime || "")];
+  }
+  function docLatest(items) {
+    var best = {}, order = [];
+    items.forEach(function (f) {
+      var k = docKey(f.title), a = docRank(f), b = best[k];
+      if (!b) { best[k] = { f: f, a: a, n: 1 }; order.push(k); return; }
+      b.n++;
+      var newer = a[0] !== b.a[0] && a[0] && b.a[0] ? a[0] > b.a[0] : a[1] !== b.a[1] ? a[1] > b.a[1] : a[2] > b.a[2];
+      if (newer) { b.f = f; b.a = a; }
+    });
+    return order.map(function (k) { var x = best[k]; return { f: x.f, old: x.n - 1 }; });
+  }
   function wsDocs(p) {
     if (DOCS.pid !== p.id) DOCS = { pid: p.id, list: [], loaded: false, busy: false, err: "", curId: "", html: "", title: "", url: "" };
     var fo = projFolders(p), has = Object.keys(fo).length, left;
@@ -1510,17 +1532,28 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     else if (DOCS.err) left = '<div class="empty">' + esc(DOCS.err) + ' <button class="btn sm" data-act="docs-reload">다시 시도</button></div>';
     else if (!DOCS.loaded) left = '<div class="empty">문서 목록을 불러오는 중입니다…</div>';
     else {
-      left = '<div class="toolbar-row"><span class="sm muted">' + DOCS.list.length + '개 문서</span><button class="btn sm" data-act="docs-reload">새로고침</button></div>';
+      var all = !!ui.docAll, shown = 0, hid = 0, body = "";
       DF.forEach(function (f) {
         var items = DOCS.list.filter(function (x) { return x.parentId === fo[f[0]]; });
-        if (items.length) left += '<div class="dgrp">' + esc(f[1]) + "</div>" + items.map(function (x) { return '<button class="ritem" data-act="doc-open" data-id="' + esc(x.id) + '"' + (DOCS.curId === x.id ? ' aria-current="true"' : "") + "><b style='font-size:13px;overflow-wrap:anywhere'>" + esc(x.title) + "</b></button>"; }).join("");
+        if (!items.length) return;
+        var rows;
+        if (all) rows = items.map(function (x) { return { f: x, old: 0 }; });
+        else {
+          if (f[0] === "99") { hid += items.length; return; }
+          var keep = items.filter(function (x) { return !/^99_이력/.test(x.title); }); hid += items.length - keep.length;
+          rows = docLatest(keep); rows.forEach(function (r) { hid += r.old; });
+        }
+        if (!rows.length) return;
+        shown += rows.length;
+        body += '<div class="dgrp">' + esc(f[1]) + "</div>" + rows.map(function (r) { var x = r.f; return '<button class="ritem" data-act="doc-open" data-id="' + esc(x.id) + '"' + (DOCS.curId === x.id ? ' aria-current="true"' : "") + "><b style='font-size:13px;overflow-wrap:anywhere'>" + esc(x.title) + "</b>" + (r.old ? '<div class="muted sm">이전 버전 ' + r.old + "개 숨김</div>" : "") + "</button>"; }).join("");
       });
+      left = '<div class="toolbar-row"><span class="sm muted">' + (all ? "전체 " + shown + "개" : "최신 " + shown + "개" + (hid ? " · 이전 " + hid + "개 숨김" : "")) + '</span><span class="acts"><button class="btn sm" data-act="docs-all">' + (all ? "최신만 보기" : "이전 버전도 보기") + '</button><button class="btn sm" data-act="docs-reload">새로고침</button></span></div>' + body;
     }
     var inf = DOCS.info || { counts: { ok: 0, as: 0, un: 0 }, toc: [], status: "" };
     var badges = (inf.status ? '<span class="pill ' + (/확정/.test(inf.status) && !/작성중|검토/.test(inf.status) ? "p-ok" : "p-warn") + '">' + esc(inf.status.length > 40 ? inf.status.slice(0, 40) + "…" : inf.status) + "</span>" : "") + [["t-ok", "확정", inf.counts.ok], ["t-as", "가정", inf.counts.as], ["t-un", "미확인", inf.counts.un]].map(function (x) { return '<span class="tag ' + x[0] + '">' + x[1] + " " + x[2] + "</span>"; }).join("") + (DOCS.url ? '<a href="' + esc(DOCS.url) + '" target="_blank" rel="noopener noreferrer">Drive에서 열기</a>' : "");
     var toc = inf.toc.length > 1 ? '<div class="dv-toc">' + inf.toc.map(function (x) { return '<button data-act="toc-go" data-id="' + esc(x[0]) + '">' + esc(x[1].replace(/^\d+\.\s*/, "")) + "</button>"; }).join("") + "</div>" : "";
     var view = DOCS.html ? '<div class="dv-head"><div class="ttl">' + esc(DOCS.title) + '</div><div class="dv-badges">' + badges + "</div>" + toc + '</div><div class="md">' + DOCS.html + "</div>" : '<div class="empty">' + (DOCS.curId ? "문서를 불러오는 중입니다…" : "왼쪽에서 문서를 고르세요.") + "</div>";
-    return '<p class="sm muted">프로젝트 Drive 폴더의 문서를 읽기 좋게 보여 줍니다.<br>파일은 Drive에 그대로 있고, 여기서는 수정하지 않습니다.' + (p.drive && p.drive.root ? '<br><a href="https://drive.google.com/drive/folders/' + esc(p.drive.root) + '" target="_blank" rel="noopener noreferrer">Drive 폴더 열기</a>' : "") + '</p><div class="docs-layout"><aside class="docs-list card">' + left + '</aside><article class="docs-view card">' + view + "</article></div>";
+    return '<p class="sm muted">프로젝트 Drive 폴더의 문서를 읽기 좋게 보여 줍니다. 같은 문서는 <b>가장 최근 것만</b> 보이고, 이전 버전과 99_이력은 숨깁니다.<br>파일은 Drive에 그대로 있고, 여기서는 수정하지 않습니다.' + (p.drive && p.drive.root ? '<br><a href="https://drive.google.com/drive/folders/' + esc(p.drive.root) + '" target="_blank" rel="noopener noreferrer">Drive 폴더 열기</a>' : "") + '</p><div class="docs-layout"><aside class="docs-list card">' + left + '</aside><article class="docs-view card">' + view + "</article></div>";
   }
   function mcpErr(e) { var c = e && e.code; if (c === "server_not_connected" || c === "needs_reauth") return "웹 버전에서는 Google Drive 연동을 쓸 수 없습니다."; if (c === "not_in_manifest" || c === "approval_required" || c === "consent_required") return "이 페이지가 Drive를 쓰도록 허용해야 합니다. 허용 창에서 허용을 선택하고 다시 시도하세요."; return "Drive에서 불러오지 못했습니다 (" + (c || "오류") + ")."; }
   var parsePl = function (r) { var pl = r && r.payload; if (typeof pl === "string") { try { pl = JSON.parse(pl); } catch (e) { pl = { fileContent: pl }; } } return pl || {}; };
@@ -3698,6 +3731,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       case "ref-open": ui.refId = id; ui.refEdit = false; sr(); break;
       case "rule-open": ui.ruleId = id; ui.refEdit = false; sr(); break;
       case "skill-open": ui.skillId = id; sr(); break;
+      case "docs-all": ui.docAll = !ui.docAll; sr(); break;
       case "ref-edit": ui.refEdit = !ui.refEdit; sr(); break;
     }
   }
