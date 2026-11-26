@@ -1,6 +1,6 @@
 ---
 name: electrical-liaison
-description: 전기팀 담당. 입력 조건서와 설계 계획서를 보고 전원, 커넥터, 접지, 배선 경로 협의 항목을 전기 협의표로 정리한다.
+description: 전기팀 담당. 입력 조건서, 설계 계획서, 컨셉 그림·3D를 보고 전원, 커넥터, 접지, 배선 경로 협의 항목을 전기 협의표로 정리한다.
 ---
 
 # electrical-liaison

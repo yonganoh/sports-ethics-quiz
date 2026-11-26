@@ -1,17 +1,20 @@
 ---
-description: Mechanical design START · 설계 시작 [프로젝트] [모듈] — 질문을 모아 묻고, 답을 받은 뒤 에이전트를 순서대로 실행
+description: Mechanical design START · 설계 시작 [프로젝트] [모듈] — 질문·컨셉 3안 → 에이전트 끝까지 → 승인 1번 → 사용자 설계 → 바뀐 자료만 재제작
 argument-hint: [프로젝트] [모듈]
 ---
 
 설계 시작 명령이다. 인자: $ARGUMENTS
 
-1. Google Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일(현재 ID `1gGBKtP9QIYSmwnNMXrPm0IYqCeW6Ia7i`)을 읽는다.
+1. Google Drive `00_공통` 폴더(`15u06EtC0vnFFmyq2Yp0gJsORWnM7vSH_`)에서 제목이 `00_START`로 시작하는 최신 파일(현재 ID `1W-xJnRqsRgHhZ3LwfUE1AGGEjWmzNgsP`)을 읽는다.
 2. 대시보드 https://claude.ai/artifact/SpewTfA39w8nvXMfmCx19F 의 `refs` 컬렉션 `r00-guide`를 ArtifactData로 읽는다.
-3. `00_START` 2장의 순서대로 진행한다.
-   - 필요 정보를 한 번에 모아 선택형으로 묻는다. 이미 아는 것은 묻지 않는다.
-   - 실행 방식(에이전트 6명 실행 / 절약)도 매번 같이 묻는다.
-   - 답을 받은 뒤에 `.claude/agents/`의 에이전트를 순서대로 실행한다.
-4. 단계마다 결과를 보여 주고 승인을 받은 뒤 다음 단계로 간다.
+3. `00_START` 2장의 워크플로(2026-11-26 개정)대로 진행한다.
+   - **0단계:** 필요 정보를 한 번에 모아 선택형으로 묻는다(이미 아는 것은 묻지 않는다). 실행 방식(에이전트 6명 실행 / 절약)도 같이 묻는다. 답을 받으면 컨셉 3안을 그림으로 보여 주고 사용자가 한 안을 고른다.
+   - **1단계 (중간 승인 없음):** `system-design` → `mech-design-assist` → 메인(컨셉 그림·3D·도면 PDF) → `electrical-liaison` → `assembly-reviewer` → `design-reviewer`(설계 검토 보고서 + 설계 지침서) → `docs-presenter` + 메인(BOM · 조립설명서 초안).
+   - **2단계:** 모든 도면과 자료를 한꺼번에 전달하고 승인을 한 번 받는다.
+   - **3단계:** 사용자가 직접 설계해 변경된 STEP과 변경된 자료를 전달한다. 메인이 변경 목록을 정리한다.
+   - **4단계:** 메인이 간섭 검사를 하고 `design-reviewer`가 짧게 확인한다. 바꿔야 하는 자료만 사용자에게 묻는다.
+   - **5단계:** 고른 자료만 새 Rev로 다시 만든다. 발표 PPT는 이 단계에서 만든다.
+4. 에이전트가 부족 정보 목록을 돌려주면 그때는 멈추고 사용자에게 묻는다.
 
 우선순위: 사용자의 그 자리 지시 > 대시보드 작업 지침 > `00_START` > 에이전트 역할 정의.
 이 파일에는 설계 값, 도면, 사양, 업체·사람 이름을 적지 않는다 (공개 저장소).
