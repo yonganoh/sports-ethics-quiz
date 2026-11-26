@@ -113,7 +113,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .card > h2 { font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 .card > h2 a, .linkbtn { font-size: 12px; font-weight: 500; color: var(--accent); background: none; border: 0; cursor: pointer; padding: 0; }
 .g3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; }
-.g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; align-items: start; }
+.g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 14px; align-items: start; }
 .big { font-family: var(--font-mono); font-size: 34px; font-weight: 500; line-height: 1.1; letter-spacing: -.02em; }
 .big small { font-size: 13px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-left: 4px; }
 .empty { color: var(--muted); padding: 14px 0; font-size: 13px; }
@@ -1009,7 +1009,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       { f: "status", l: "상태", t: "sel", o: [["wait", "대기"], ["run", "진행"], ["done", "완료"]] }, { f: "note", l: "메모", t: "area", w: 1 }] },
     projects: { name: "프로젝트", title: "name", back: "프로젝트", fields: [{ f: "name", l: "프로젝트명", t: "text" }, { f: "vehicleCo", l: "차량 업체", t: "text" }, { f: "due", l: "납기", t: "date" }, { f: "unit", l: "구성 단위 이름 (비우면 모듈, 예: 파트)", t: "text" }, { f: "frame", l: "프레임 협의 (성신)", t: "sel", o: [["off", "사용 안 함"], ["on", "사용"]] }] },
     calcs: { name: "공식", title: "name", back: "설계 계산", fields: [
-      { f: "name", l: "공식명", t: "text" }, { f: "cat", l: "분류", t: "sel", o: ["열량", "아이솔레이트", "구조해석", "기타"] }, { f: "formula", l: "공식", t: "area", w: 1, r: 2 },
+      { f: "name", l: "공식명", t: "text" }, { f: "cat", l: "분류", t: "sel", o: ["열량", "아이솔레이트", "구조해석", "체결·토크", "전기", "모터", "기구·무게", "기타"] }, { f: "formula", l: "공식", t: "area", w: 1, r: 2 },
       { f: "vars", l: "변수·단위", t: "area", w: 1 }, { f: "example", l: "사용 예시", t: "area", w: 1 }, { f: "src", l: "출처·비고", t: "text", w: 1 }], def: function () { return { name: "새 공식", cat: "기타" }; } }
   };
 
@@ -1802,7 +1802,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   }
   function vCalcs() {
     if (ui.detail && ui.detail.col === "calcs") return vDetail();
-    var cats = ["열량", "아이솔레이트", "구조해석", "기타"], f = ui.filt.calc || "전체", rows = D.calcs.filter(function (c) { return f === "전체" || c.cat === f; }).sort(function (a, b) { return (a.cat || "") < (b.cat || "") ? -1 : 1; });
+    var cats = ["열량", "아이솔레이트", "구조해석", "체결·토크", "전기", "모터", "기구·무게", "기타"], f = ui.filt.calc || "전체", rows = D.calcs.filter(function (c) { return f === "전체" || c.cat === f; }).sort(function (a, b) { return (a.cat || "") < (b.cat || "") ? -1 : 1; });
     var cv = function (id, def) { return ui.calcv && ui.calcv[id] != null ? ui.calcv[id] : def; };
     var inp = function (id, lab, val, unit, step) { return '<div class="fld"><label for="' + id + '">' + lab + (unit ? " [" + unit + "]" : "") + '</label><input id="' + id + '" type="number" step="' + (step || "any") + '" value="' + esc(cv(id, val)) + '" data-calc="1"></div>'; };
     var h = head("", "설계 계산", "입력하면 바로 계산됩니다.<br>결과는 참고용이니 중요한 값은 검산하세요.", addBtn("calcs", "공식 추가"));
