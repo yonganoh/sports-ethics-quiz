@@ -738,7 +738,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   };
   var NAV = [
     ["현황", [["home", "홈"], ["projects", "프로젝트"]]],
-    ["협의 · 변경", [["issues", "협의 이슈"], ["ecm", "ECM"], ["partners", "협력사"]]],
+    ["협의 · 변경", [["issues", "협의 이슈"], ["ecm", "ECM"], ["partners", "협력사"], ["contactbook", "연락처"]]],
     ["일상", [["todo", "TODO · 달력"], ["meetings", "회의록"]]],
     ["지식", [["refs", "설계 자료실"], ["calcs", "설계 계산"], ["rules", "작업 규칙"], ["skills", "스킬"]]]
   ];
@@ -760,7 +760,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   var D = {}, LOADED = {}, ERR = {};
   COLS.forEach(function (c) { D[c] = []; });
   D.personal = [];
-  var ui = { pid: "jong2", wsOpen: false, tab: "dash", open: {}, orgOpen: {}, selTask: null, selMs: null, scale: 10, view: "home", detail: null, day: null, cal: TODAY().slice(0, 7), filt: {}, confirm: "", refId: null, refEdit: false, q: "", dictOn: false, dictPartial: "", aiBusy: false, aiMsg: "", menu: false };
+  var ui = { pid: "jong2", wsOpen: false, tab: "dash", open: {}, orgOpen: {}, bookOpen: {}, selTask: null, selMs: null, scale: 10, view: "home", detail: null, day: null, cal: TODAY().slice(0, 7), filt: {}, confirm: "", refId: null, refEdit: false, q: "", dictOn: false, dictPartial: "", aiBusy: false, aiMsg: "", menu: false };
   var VIEWS = NAV.reduce(function (a, g) { return a.concat(g[1].map(function (x) { return x[0]; })); }, []).concat(["personal"]);
   var byId = function (c, id) { for (var i = 0; i < D[c].length; i++) if (D[c][i].id === id) return D[c][i]; return null; };
   var strip = function (o) { var r = {}; for (var k in o) if (k !== "id") r[k] = o[k]; return r; };
@@ -1437,6 +1437,39 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     return h + orgs.map(function (o) {
       var open = ui.orgOpen[o.name] === true;
       return '<div class="ct-org"><div class="ct-head"><button class="tg" data-act="org-toggle" data-org="' + esc(o.name) + '" aria-expanded="' + open + '" aria-label="펼치기 또는 접기">' + (open ? "▾" : "▸") + '</button><button class="nm" data-act="org-toggle" data-org="' + esc(o.name) + '">' + esc(o.name) + '</button><span class="tag">' + esc(o.type || "구분 없음") + '</span><span class="cnt">' + o.list.length + "명</span></div>" + (open ? '<div class="ct-body">' + (canW ? '<div class="addrow"><input class="in" data-orgrename="' + esc(o.name) + '" value="' + esc(o.name) + '" aria-label="조직 이름"><input class="in" data-orgtype="' + esc(o.name) + '" value="' + esc(o.type) + '" placeholder="구분(발주처, 차량업체, 협력사 …)" aria-label="조직 구분"></div>' : "") + '<table><thead><tr><th>이름</th><th>직위</th><th>부서·담당</th><th>모듈</th><th>전화</th><th>이메일</th><th></th></tr></thead><tbody>' + o.list.map(function (c) { return "<tr><td>" + fi(c, "name", "이름") + "</td><td>" + fi(c, "title", "직위") + "</td><td>" + fi(c, "dept", "부서·담당") + "</td><td>" + fi(c, "module", "모듈") + "</td><td>" + fi(c, "phone", "전화") + "</td><td>" + fi(c, "email", "이메일") + "</td><td>" + (canW ? '<button class="btn sm dng" data-act="contact-del" data-id="' + c.id + '">삭제</button>' : "") + "</td></tr>"; }).join("") + "</tbody></table>" + (canW ? '<button class="btn sm" style="margin-top:8px" data-act="ct-add" data-org="' + esc(o.name) + '" data-type="' + esc(o.type) + '">+ 이 조직에 담당자 추가</button>' : "") + "</div>" : "") + "</div>";
+    }).join("");
+  }
+
+  /* --- 연락처 목록 (구분별 토글, 관리자 전용). 프로젝트 연락처와 같은 contacts 컬렉션을 쓴다 --- */
+  var BOOK_CATS = ["투아이시스", "외주업체", "발주처 · 기관", "지인", "가족"];
+  function bookCat(c) {
+    if (c.cat && BOOK_CATS.indexOf(c.cat) >= 0) return c.cat;
+    var t = (c.orgType || "") + " " + (c.org || "");
+    if (/사내|투아이시스/.test(t)) return "투아이시스";
+    if (/발주처|검사기관|공단/.test(t)) return "발주처 · 기관";
+    return "외주업체";
+  }
+  function vBook() {
+    var head = '<div class="ph"><div><div class="crumb">협의 · 변경</div><h1>연락처</h1><div class="sub">구분을 누르면 펼쳐집니다. 칸을 눌러 바로 고치고, 구분마다 새 사람을 추가할 수 있습니다.</div></div></div>';
+    if (!isAdmin) return head + '<div class="banner">연락처는 관리자 권한에서만 볼 수 있습니다.</div>';
+    if (!LOADED.contacts) return head + '<div class="card"><div class="empty">불러오는 중…</div></div>';
+    var dis = canW ? "" : " disabled";
+    var fi = function (c, f, ph) { return '<label class="bx-l">' + ph + '<input class="in" data-col="contacts" data-id="' + c.id + '" data-f="' + f + '" value="' + esc(c[f]) + '" aria-label="' + ph + '"' + dis + "></label>"; };
+    var by = {}; BOOK_CATS.forEach(function (k) { by[k] = []; });
+    D.contacts.forEach(function (c) { by[bookCat(c)].push(c); });
+    return head + BOOK_CATS.map(function (k) {
+      var list = by[k].slice().sort(function (a, b) { return String(a.org || "").localeCompare(String(b.org || ""), "ko") || String(a.name || "").localeCompare(String(b.name || ""), "ko"); });
+      var open = ui.bookOpen[k] === true;
+      var body = "";
+      if (open) {
+        body = '<div class="ct-body">' + (list.length ? '<div class="bx-rows">' + list.map(function (c) {
+          return '<div class="bx-row"><div class="bx-g">' + fi(c, "name", "이름") + fi(c, "title", "직위") + fi(c, "org", "회사 · 소속") + fi(c, "phone", "전화") + fi(c, "email", "이메일") + fi(c, "dept", "담당 · 관계") + fi(c, "note", "메모") +
+            '<label class="bx-l">구분<select class="in" data-col="contacts" data-id="' + c.id + '" data-f="cat" aria-label="구분"' + dis + ">" + BOOK_CATS.map(function (x) { return "<option" + (x === k ? " selected" : "") + ">" + esc(x) + "</option>"; }).join("") + "</select></label></div>" +
+            (canW ? '<div style="text-align:right;margin-top:6px"><button class="btn sm dng" data-act="contact-del" data-id="' + c.id + '">삭제</button></div>' : "") + "</div>";
+        }).join("") + "</div>" : '<div class="empty">아직 등록된 사람이 없습니다.</div>') +
+          (canW ? '<button class="btn sm" style="margin-top:8px" data-act="book-add" data-cat="' + esc(k) + '">+ ' + esc(k) + "에 추가</button>" : "") + "</div>";
+      }
+      return '<div class="ct-org"><div class="ct-head"><button class="tg" data-act="book-toggle" data-cat="' + esc(k) + '" aria-expanded="' + open + '" aria-label="펼치기 또는 접기">' + (open ? "▾" : "▸") + '</button><button class="nm" data-act="book-toggle" data-cat="' + esc(k) + '">' + esc(k) + '</button><span class="cnt">' + list.length + "명</span></div>" + body + "</div>";
     }).join("");
   }
 
@@ -3143,8 +3176,8 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   }
 
   /* ---------- 렌더 ---------- */
-  var GROUPS = [["home", "홈", ["home"], ICON.home], ["projects", "프로젝트", ["projects"], ICON.projects], ["talk", "협의 · 변경", ["issues", "ecm", "partners"], ICON.issues], ["daily", "TODO · 회의록", ["todo", "meetings"], ICON.todo], ["me", "개인", ["personal"], "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"], ["know", "자료실 · 계산 · 규칙 · 스킬", ["refs", "calcs", "rules", "skills"], ICON.refs]];
-  var VNAME = { issues: "협의 이슈", ecm: "ECM", partners: "협력사", todo: "TODO · 달력", meetings: "회의록", refs: "설계 자료실", calcs: "설계 계산", rules: "작업 규칙", skills: "스킬" }, LASTV = {};
+  var GROUPS = [["home", "홈", ["home"], ICON.home], ["projects", "프로젝트", ["projects"], ICON.projects], ["talk", "협의 · 변경 · 연락처", ["issues", "ecm", "partners", "contactbook"], ICON.issues], ["daily", "TODO · 회의록", ["todo", "meetings"], ICON.todo], ["me", "개인", ["personal"], "M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"], ["know", "자료실 · 계산 · 규칙 · 스킬", ["refs", "calcs", "rules", "skills"], ICON.refs]];
+  var VNAME = { issues: "협의 이슈", ecm: "ECM", partners: "협력사", contactbook: "연락처", todo: "TODO · 달력", meetings: "회의록", refs: "설계 자료실", calcs: "설계 계산", rules: "작업 규칙", skills: "스킬" }, LASTV = {};
   function groupOf(v) { for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i][2].indexOf(v) >= 0) return GROUPS[i][0]; return "home"; }
   function pillItems() {
     var g = groupOf(ui.view), ps = projects();
@@ -3215,7 +3248,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
     var v = ui.view, h = "";
     if (v === "home") h = vHome(); else if (v === "projects") h = vProjects();
     else if (v === "issues" || v === "ecm" || v === "partners") h = vTable(v); else if (v === "todo") h = vTodo(); else if (v === "meetings") h = vMeetings();
-    else if (v === "refs") h = vRefs(); else if (v === "calcs") h = vCalcs(); else if (v === "rules") h = vRules(); else if (v === "skills") h = vSkills(); else if (v === "personal") h = vPersonal();
+    else if (v === "refs") h = vRefs(); else if (v === "calcs") h = vCalcs(); else if (v === "rules") h = vRules(); else if (v === "skills") h = vSkills(); else if (v === "personal") h = vPersonal(); else if (v === "contactbook") h = vBook();
     rebuildHol();
     var banner = "";
     if (!db && booted) banner = '<div class="banner">데이터베이스에 연결하지 못했습니다. 새로고침하거나 다시 로그인해 주세요.</div>';
@@ -3573,6 +3606,8 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
       case "mp-del": { var L3 = meetProjList().slice(), i3 = +d.i; if (L3[i3]) { L3.splice(i3, 1); write("settings", "meetproj", function () { return { list: L3 }; }); } break; }
       case "hol-save": { var lines = (($("#holText") || {}).value || "").split("\n").map(function (x) { return x.trim(); }).filter(Boolean); write("settings", "hol", function () { return { extra: lines }; }); toast("저장했습니다"); break; }
       case "org-toggle": ui.orgOpen[d.org] = ui.orgOpen[d.org] !== true; sr(); break;
+      case "book-toggle": ui.bookOpen[d.cat] = ui.bookOpen[d.cat] !== true; sr(); break;
+      case "book-add": { if (!canW) return; var bc = { projectId: "_book", cat: d.cat, org: "", orgType: "", name: "", title: "", dept: "", module: "", phone: "", email: "", note: "", order: D.contacts.length + 1 }, nb = create("contacts", bc); if (nb) { D.contacts.push(Object.assign({ id: nb }, bc)); ui.bookOpen[d.cat] = true; sr(); } break; }
       case "org-new": case "ct-add": { if (!canW) return; var oc = { projectId: ui.pid, org: a === "ct-add" ? d.org : "새 조직", orgType: a === "ct-add" ? d.type : "", name: "", title: "", dept: "", module: "", phone: "", email: "", order: D.contacts.length + 1 }, no = create("contacts", oc); if (no) { D.contacts.push(Object.assign({ id: no }, oc)); ui.orgOpen[oc.org] = true; sr(); } break; }
       case "docs-reload": DOCS.loaded = false; DOCS.err = ""; DOCS.html = ""; sr(); break;
       case "doc-open": openDoc(id); break;
@@ -3899,6 +3934,7 @@ html.tx-on body * { cursor: text !important; } html.tx-on #tw-txbar *, html.tx-o
   })();
 })();
 </script>
+
 
 
 
